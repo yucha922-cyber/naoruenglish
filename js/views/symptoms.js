@@ -1,6 +1,6 @@
 import { symptoms, symptomCategories } from '../data/symptoms.js';
 import { muscleByName } from '../data/muscles.js';
-import { esc, phraseList, pageHead, callout } from '../lib/ui.js';
+import { esc, phraseList, wordList, pageHead, callout } from '../lib/ui.js';
 
 export function renderIndex(category = 'すべて') {
   const list = category === 'すべて' ? symptoms : symptoms.filter((s) => s.category === category);
@@ -39,17 +39,10 @@ export function renderDetail(id) {
   const s = symptoms.find((x) => x.id === id);
   if (!s) return null;
 
-  const muscleRows = s.muscles
-    .map((name) => {
-      const m = muscleByName(name);
-      return `
-        <div class="word-row">
-          <span class="word-en">${esc(name)}</span>
-          <button class="tool-btn" data-speak="${esc(name)}" aria-label="読み上げる">🔊</button>
-          <span class="word-ja">${m ? esc(m.ja) : ''}${m?.kana ? ` <span class="word-kana">${esc(m.kana)}</span>` : ''}</span>
-        </div>`;
-    })
-    .join('');
+  const muscleRows = wordList(s.muscles, (name) => {
+    const m = muscleByName(name);
+    return [{ en: name, ja: m?.ja || '', kana: m?.kana }, {}];
+  });
 
   return `
     ${pageHead(`${s.icon} ${s.name}`, s.nameEn, '#/symptoms')}
@@ -73,7 +66,7 @@ export function renderDetail(id) {
 
     <section>
       <h2 class="section-title">関連する筋肉</h2>
-      <div class="word-list">${muscleRows}</div>
+      ${muscleRows}
     </section>
 
     <section>
