@@ -10,17 +10,97 @@ export const canSpeak = !!synth;
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 export const canListen = !!SR;
 
+/* ---------------- 音声の選定 ----------------
+ * 端末に入っている音声は品質の差が非常に大きく、放っておくと
+ * eSpeak 系の機械的な音声が選ばれてしまいます。
+ * ここでは「自然に聞こえる女性の声」を優先して並べ替えます。
+ */
+
+// 英語圏の代表的な女性音声の名前
+const FEMALE_NAMES = [
+  // Apple（macOS / iOS）
+  'samantha', 'ava', 'allison', 'susan', 'zoe', 'nicky', 'karen', 'moira',
+  'tessa', 'fiona', 'serena', 'kate', 'vicki', 'victoria', 'agnes', 'princess',
+  // Google（Chrome / Android）
+  'google us english', 'google uk english female', 'google australian',
+  // Microsoft（Windows）
+  'zira', 'aria', 'jenny', 'michelle', 'hazel', 'eva', 'linda', 'catherine',
+  'heera', 'ana', 'sara', 'nancy', 'amber', 'ashley', 'cora', 'elizabeth',
+  'monica', 'jane', 'nova', 'emma', 'libby', 'sonia', 'natasha', 'clara',
+  'aisha', 'yan', 'molly', 'olivia'
+];
+
+// 男性音声（避けたいもの）
+const MALE_NAMES = [
+  'alex', 'daniel', 'fred', 'tom', 'oliver', 'aaron', 'gordon', 'rishi',
+  'lee', 'david', 'mark', 'george', 'james', 'ryan', 'guy', 'eric', 'liam',
+  'christopher', 'brandon', 'jason', 'tony', 'davis', 'andrew', 'brian',
+  'steffan', 'roger', 'william', 'thomas', 'arthur', 'reed', 'albert', 'junior'
+];
+
+/**
+ * 音声名に指定の名前が含まれるか調べる。
+ * 単語単位で照合する。部分一致にすると "English (America)" の中の
+ * "eric"、"Canada" の中の "ana" のような誤判定が起きるため。
+ */
+function has(name, list) {
+  const tokens = new Set(name.split(/[^a-z0-9]+/).filter(Boolean));
+  return list.some((n) => (n.includes(' ') ? name.includes(n) : tokens.has(n)));
+}
+
+/** 音声の「聞きやすさ」を点数化する。高いほど自然で聞き取りやすい。 */
+function scoreVoice(v) {
+  const name = (v.name || '').toLowerCase();
+  let s = 0;
+
+  // 機械的に聞こえる音声を強く避ける
+  if (/espeak|compact|eloquence|pico|festival|flite|mbrola/.test(name)) s -= 200;
+
+  // 高品質を示すキーワード
+  if (/natural|neural/.test(name)) s += 60;
+  if (/premium|enhanced/.test(name)) s += 45;
+  if (/\bsiri\b/.test(name)) s += 35;
+  // Google の音声はネットワーク合成で、総じて最も自然に聞こえる
+  if (/google/.test(name)) s += 40;
+  if (/microsoft/.test(name)) s += 10;
+
+  // 女性の声を優先する
+  if (/female/.test(name) || has(name, FEMALE_NAMES)) s += 50;
+  if (/\bmale\b/.test(name) || has(name, MALE_NAMES)) s -= 60;
+
+  // 地域は米国英語を基本に、英・豪を次点とする
+  if (v.lang === 'en-US') s += 20;
+  else if (v.lang === 'en-GB' || v.lang === 'en-AU') s += 12;
+  else if (/^en-(CA|IE|NZ)$/i.test(v.lang)) s += 6;
+
+  // 端末が既定にしている音声はわずかに加点
+  if (v.default) s += 3;
+
+  return s;
+}
+
 let voices = [];
 
 export function loadVoices() {
   if (!canSpeak) return [];
-  voices = synth.getVoices().filter((v) => v.lang && v.lang.toLowerCase().startsWith('en'));
+  voices = synth
+    .getVoices()
+    .filter((v) => v.lang && v.lang.toLowerCase().startsWith('en'))
+    .map((v) => ({ voice: v, score: scoreVoice(v) }))
+    .sort((a, b) => b.score - a.score)
+    .map((x) => x.voice);
   return voices;
 }
 
+/** 聞きやすい順に並んだ英語音声の一覧 */
 export function englishVoices() {
   if (!voices.length) loadVoices();
   return voices;
+}
+
+/** その音声が「おすすめ」と呼べる品質かどうか */
+export function isRecommended(v) {
+  return scoreVoice(v) >= 70;
 }
 
 if (canSpeak) {
@@ -31,17 +111,14 @@ if (canSpeak) {
 function pickVoice() {
   const list = englishVoices();
   if (!list.length) return null;
+
   const saved = settings.get('voiceURI');
   if (saved) {
     const found = list.find((v) => v.voiceURI === saved);
     if (found) return found;
   }
-  // 端末標準の米国英語を優先
-  return (
-    list.find((v) => v.lang === 'en-US' && v.localService) ||
-    list.find((v) => v.lang === 'en-US') ||
-    list[0]
-  );
+  // 並べ替え済みなので先頭が最も自然に聞こえる音声
+  return list[0];
 }
 
 let currentBtn = null;
@@ -65,11 +142,11 @@ export function speak(text, opts = {}) {
 
   const u = new SpeechSynthesisUtterance(text);
   const voice = pickVoice();
-  if (voice) {
-    u.voice = voice;
-    u.lang = voice.lang;
-  } else {
-    u.lang = 'en-US';
+  u.lang = voice?.lang || 'en-US';
+  try {
+    if (voice) u.voice = voice;
+  } catch {
+    // 音声の割り当てに失敗しても、端末既定の声で読み上げは続ける
   }
   u.rate = opts.rate ?? settings.get('rate') ?? 0.9;
   u.pitch = 1;
