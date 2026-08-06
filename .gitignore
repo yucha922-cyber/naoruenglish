@@ -1,0 +1,46 @@
+# 環境変数・秘密情報（公開リポジトリのため必ず除外）
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.json
+credentials.json
+
+# 依存パッケージ
+node_modules/
+.pnpm-store/
+vendor/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# ビルド成果物
+dist/
+build/
+out/
+.next/
+.nuxt/
+*.egg-info/
+
+# ログ・一時ファイル
+*.log
+npm-debug.log*
+yarn-error.log*
+tmp/
+.cache/
+
+# テスト・カバレッジ
+coverage/
+.pytest_cache/
+.coverage
+
+# OS
+.DS_Store
+Thumbs.db
+
+# エディタ
+.vscode/
+.idea/
+*.swp
