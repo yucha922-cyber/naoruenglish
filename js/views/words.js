@@ -1,6 +1,6 @@
 import { vocabulary } from '../data/vocabulary.js';
 import { muscles, muscleRegions, muscleTalk } from '../data/muscles.js';
-import { esc, wordRow, pageHead, phraseList } from '../lib/ui.js';
+import { esc, wordRow, wordList, pageHead, phraseList } from '../lib/ui.js';
 
 export function renderVocabIndex() {
   return `
@@ -38,24 +38,17 @@ export function renderVocabCategory(id) {
 
   return `
     ${pageHead(`${c.icon} ${c.title}`, c.description, '#/words')}
-    <div class="word-list">${c.words.map(wordRow).join('')}</div>
+    <div class="word-list">${c.words.map((w) => wordRow(w)).join('')}</div>
   `;
 }
 
 export function renderMuscles(region = 'all') {
   const list = region === 'all' ? muscles : muscles.filter((m) => m.region === region);
 
-  const rows = list
-    .map(
-      (m) => `
-    <div class="word-row">
-      <span class="word-en">${esc(m.en)}${m.abbr ? ` <span class="tag">${esc(m.abbr)}</span>` : ''}</span>
-      <button class="tool-btn" data-speak="${esc(m.en)}" aria-label="読み上げる">🔊</button>
-      <span class="word-ja">${esc(m.ja)} <span class="word-kana">${esc(m.kana)}</span></span>
-      <span class="word-note">作用：${esc(m.action)}${m.note ? `／${esc(m.note)}` : ''}</span>
-    </div>`
-    )
-    .join('');
+  const rows = wordList(list, (m) => [
+    { en: m.en, ja: m.ja, kana: m.kana, note: `作用：${m.action}${m.note ? `／${m.note}` : ''}` },
+    { tag: m.abbr }
+  ]);
 
   return `
     ${pageHead('💪 筋肉の英語名', '部位で絞り込めます。カタカナは発音の目安です。', '#/words')}
@@ -70,7 +63,7 @@ export function renderMuscles(region = 'all') {
         .join('')}
     </div>
 
-    <div class="word-list">${rows || '<p class="empty">該当する筋肉がありません。</p>'}</div>
+    ${rows}
 
     <section>
       <h2 class="section-title">施術中に使える説明フレーズ</h2>

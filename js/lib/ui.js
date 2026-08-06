@@ -37,17 +37,28 @@ export function phraseList(items, opts = {}) {
   return `<div class="phrase-list">${items.map((p) => phraseCard(p, opts)).join('')}</div>`;
 }
 
-/** 単語1件分の行 */
-export function wordRow(w) {
+/**
+ * 単語1件分の行。単語集・筋肉一覧・症状ページの関連筋肉で共通に使う。
+ * @param {{en: string, ja?: string, kana?: string, note?: string}} w
+ * @param {{tag?: string}} opts tag は略称バッジ（例：Upper traps）
+ */
+export function wordRow(w, opts = {}) {
   const fav = favorites.has(w.en);
   return `
     <div class="word-row">
-      <span class="word-en">${esc(w.en)}</span>
-      <button class="tool-btn" data-speak="${esc(w.en)}" aria-label="読み上げる">🔊</button>
-      <span class="word-ja">${esc(w.ja)}${w.kana ? ` <span class="word-kana">${esc(w.kana)}</span>` : ''}</span>
+      <span class="word-en">${esc(w.en)}${opts.tag ? ` <span class="tag">${esc(opts.tag)}</span>` : ''}</span>
+      <span class="word-ja">${esc(w.ja || '')}${w.kana ? ` <span class="word-kana">${esc(w.kana)}</span>` : ''}</span>
+      <div class="word-tools">
+        <button class="tool-btn" data-speak="${esc(w.en)}" aria-label="読み上げる" title="読み上げる">🔊</button>
+        <button class="tool-btn${fav ? ' is-on' : ''}" data-fav="${esc(w.en)}" aria-label="お気に入り" title="お気に入り">${fav ? '★' : '☆'}</button>
+      </div>
       ${w.note ? `<span class="word-note">${esc(w.note)}</span>` : ''}
-      <button class="tool-btn${fav ? ' is-on' : ''}" data-fav="${esc(w.en)}" aria-label="お気に入り" hidden>${fav ? '★' : '☆'}</button>
     </div>`;
+}
+
+export function wordList(items, mapper = (x) => [x, {}]) {
+  if (!items.length) return `<p class="empty">該当するものがありません。</p>`;
+  return `<div class="word-list">${items.map((x) => wordRow(...mapper(x))).join('')}</div>`;
 }
 
 export function pageHead(title, desc, backHref) {
