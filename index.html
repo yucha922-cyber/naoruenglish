@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="整体・セラピスト向けの実用英会話サイト。来院時の挨拶から問診・検査・説明・施術プラン提案までの一連の流れをカバーし、単語集・筋肉名・クイズ・発音練習・会話シミュレーションで学べます。">
+<meta name="theme-color" content="#2f7d6e">
+<title>セラピストの英会話 | ナオル整体</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🩺</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-inner">
+    <a class="brand" href="#/">
+      <span class="brand-mark">🩺</span>
+      <span class="brand-text">
+        <strong>セラピストの英会話</strong>
+        <small>ナオル整体</small>
+      </span>
+    </a>
+    <div class="header-actions">
+      <button id="settings-btn" class="icon-btn" aria-label="設定">⚙️</button>
+    </div>
+  </div>
+  <form class="search-bar" id="search-form" role="search">
+    <span class="search-icon" aria-hidden="true">🔍</span>
+    <input type="search" id="search-input" placeholder="日本語でも英語でも検索できます" aria-label="フレーズ・単語を検索" autocomplete="off">
+  </form>
+</header>
+
+<main id="app" class="app-main" tabindex="-1"></main>
+
+<nav class="tab-bar" aria-label="メインメニュー">
+  <a href="#/" data-tab="home"><span>🏠</span>ホーム</a>
+  <a href="#/flow" data-tab="flow"><span>🩺</span>施術の流れ</a>
+  <a href="#/symptoms" data-tab="symptoms"><span>🩹</span>症状別</a>
+  <a href="#/words" data-tab="words"><span>📖</span>単語・筋肉</a>
+  <a href="#/learn" data-tab="learn"><span>🎓</span>学習</a>
+</nav>
+
+<!-- 患者様に見せる拡大表示 -->
+<div class="modal" id="present-modal" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-panel present-panel" role="dialog" aria-modal="true" aria-label="拡大表示">
+    <button class="modal-close" data-close aria-label="閉じる">✕</button>
+    <p class="present-en" id="present-en"></p>
+    <p class="present-ja" id="present-ja"></p>
+    <button class="btn btn-primary btn-lg" id="present-speak">🔊 読み上げる</button>
+    <p class="present-tip">画面を患者様に向けてお使いください</p>
+  </div>
+</div>
+
+<!-- 設定 -->
+<div class="modal" id="settings-modal" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-label="設定">
+    <button class="modal-close" data-close aria-label="閉じる">✕</button>
+    <h2>設定</h2>
+
+    <label class="field">
+      <span class="field-label">読み上げの速さ <output id="rate-out">1.0</output></span>
+      <input type="range" id="rate-range" min="0.5" max="1.2" step="0.05" value="0.9">
+      <span class="field-help">患者様に聞かせるときは 0.8〜0.9 が聞き取りやすい速さです。</span>
+    </label>
+
+    <label class="field">
+      <span class="field-label">読み上げの声</span>
+      <select id="voice-select"></select>
+      <span class="field-help">お使いの端末にインストールされている英語の音声が表示されます。</span>
+    </label>
+
+    <div class="field">
+      <span class="field-label">この端末の対応状況</span>
+      <ul class="support-list" id="support-list"></ul>
+    </div>
+
+    <button class="btn btn-ghost btn-block" id="reset-progress">学習の記録をリセット</button>
+  </div>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
