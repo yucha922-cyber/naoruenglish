@@ -65,11 +65,38 @@
       <span class="field-help">患者様に聞かせるときは 0.8〜0.9 が聞き取りやすい速さです。</span>
     </label>
 
-    <label class="field">
+    <div class="field">
       <span class="field-label">読み上げの声</span>
-      <select id="voice-select"></select>
-      <span class="field-help">お使いの端末にインストールされている英語の音声が表示されます。</span>
-    </label>
+      <div class="voice-picker">
+        <select id="voice-select"></select>
+        <button class="btn" id="voice-preview" type="button">🔊 試す</button>
+      </div>
+      <span class="field-help">
+        自然に聞こえる女性の声を上から順に並べています。「★おすすめ」が付いたものが最も聞き取りやすい音声です。
+      </span>
+
+      <details class="voice-help">
+        <summary>声が機械っぽいときは</summary>
+        <p>
+          読み上げの音声は端末に入っているものを使うため、品質は端末によって変わります。
+          より自然な声は、下の手順で無料で追加できます。
+        </p>
+        <dl>
+          <dt>iPhone・iPad</dt>
+          <dd>設定 › アクセシビリティ › 読み上げコンテンツ › 声 › 英語 から <b>Samantha</b> や <b>Ava</b> の「拡張」「プレミアム」版をダウンロードしてください。</dd>
+          <dt>Android</dt>
+          <dd>設定 › ユーザー補助 › 読み上げ（テキスト読み上げの設定）から「Google テキスト読み上げエンジン」を選び、音声データを更新してください。</dd>
+          <dt>Windows</dt>
+          <dd>設定 › 時刻と言語 › 音声認識 › 音声を追加 から英語の音声を追加してください。名前に <b>Natural</b> が付くものが最も自然です。</dd>
+          <dt>Mac</dt>
+          <dd>システム設定 › アクセシビリティ › 読み上げコンテンツ › システムの声 › 英語 から拡張版をダウンロードしてください。</dd>
+        </dl>
+        <p class="voice-help-tip">
+          追加したあとにこのページを再読み込みすると、一覧に表示されます。
+          なお Google Chrome では、端末に何も追加しなくても「Google US English」が使えます。
+        </p>
+      </details>
+    </div>
 
     <div class="field">
       <span class="field-label">この端末の対応状況</span>

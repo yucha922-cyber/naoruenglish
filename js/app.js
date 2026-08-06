@@ -1,6 +1,6 @@
 import { route, start, resolve, setNotFound, currentPath } from './lib/router.js';
 import { favorites, progress, settings } from './lib/storage.js';
-import { speak, stopSpeaking, canSpeak, canListen, englishVoices, loadVoices } from './lib/speech.js';
+import { speak, stopSpeaking, canSpeak, canListen, englishVoices, loadVoices, isRecommended } from './lib/speech.js';
 import { esc } from './lib/ui.js';
 
 import * as home from './views/home.js';
@@ -194,23 +194,37 @@ rateRange.addEventListener('input', () => {
   settings.set('rate', Number(rateRange.value));
 });
 
+const PREVIEW_TEXT = 'Hello, welcome to Naoru Seitai. Where does it hurt?';
+
 function fillVoices() {
   loadVoices();
   const list = englishVoices();
   const saved = settings.get('voiceURI');
-  voiceSelect.innerHTML = list.length
-    ? list
-        .map(
-          (v) =>
-            `<option value="${esc(v.voiceURI)}"${v.voiceURI === saved ? ' selected' : ''}>${esc(v.name)}（${esc(v.lang)}）</option>`
-        )
-        .join('')
-    : '<option value="">利用できる英語音声がありません</option>';
+
+  if (!list.length) {
+    voiceSelect.innerHTML = '<option value="">利用できる英語音声がありません</option>';
+    return;
+  }
+
+  // englishVoices() は聞きやすい順に並んでいる
+  voiceSelect.innerHTML = list
+    .map((v) => {
+      const label = `${isRecommended(v) ? '★おすすめ ' : ''}${v.name}（${v.lang}）`;
+      return `<option value="${esc(v.voiceURI)}"${v.voiceURI === saved ? ' selected' : ''}>${esc(label)}</option>`;
+    })
+    .join('');
+
+  // 未設定なら、最も自然に聞こえる音声を選んだ状態で表示する
+  if (!saved) voiceSelect.value = list[0].voiceURI;
 }
 
 voiceSelect.addEventListener('change', () => {
   settings.set('voiceURI', voiceSelect.value);
-  speak('Hello. This is how I sound.');
+  speak(PREVIEW_TEXT);
+});
+
+document.getElementById('voice-preview').addEventListener('click', (e) => {
+  speak(PREVIEW_TEXT, { button: e.currentTarget });
 });
 
 function fillSupport() {
