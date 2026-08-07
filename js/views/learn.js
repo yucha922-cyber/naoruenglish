@@ -4,7 +4,7 @@ import { allWords } from '../data/vocabulary.js';
 import { muscles } from '../data/muscles.js';
 import { scenarios } from '../data/scenarios.js';
 import { progress, favorites } from '../lib/storage.js';
-import { speak, canListen, listenOnce, compareSpeech, stopSpeaking } from '../lib/speech.js';
+import { speak, canListen, startListening, compareSpeech, stopSpeaking } from '../lib/speech.js';
 import { esc, pageHead, shuffle, sample, callout } from '../lib/ui.js';
 
 /* ============================ 学習ハブ ============================ */
@@ -329,88 +329,155 @@ export function mountPronunciation(root, source = 'phrase') {
   }
 
   let current = pool[Math.floor(Math.random() * pool.length)];
-  let listening = false;
+  let state = 'idle'; // idle | listening | result
+  let session = null;
+  let resultHtml = '';
 
-  function draw(resultHtml = '') {
+  function pickNext() {
+    let next = current;
+    if (pool.length > 1) {
+      while (next.en === current.en) next = pool[Math.floor(Math.random() * pool.length)];
+    }
+    current = next;
+  }
+
+  function micArea() {
+    if (!canListen) {
+      return `<div class="callout warn">
+        <h3>この端末では音声認識が使えません</h3>
+        <p style="margin:0">音声認識は Google Chrome か Safari でご利用いただけます。手本を聞いて口に出す練習はこのままできます。</p>
+      </div>`;
+    }
+
+    if (state === 'listening') {
+      return `
+        <button class="mic-btn is-listening" data-stop aria-label="聞き取りを止めて判定する">⏹</button>
+        <p class="pron-status">聞き取り中です。ゆっくりで大丈夫です。</p>
+        <p class="pron-live" id="pron-live">…</p>
+        <div class="btn-row" style="justify-content:center;margin-top:16px">
+          <button class="btn btn-primary btn-lg" data-stop>話し終わった・判定する</button>
+        </div>
+        <p class="pron-note">自動では止まりません。区切って話しても大丈夫です。</p>`;
+    }
+
+    return `
+      <button class="mic-btn" data-mic aria-label="録音を始める">🎤</button>
+      <p class="pron-status">${state === 'result' ? 'もう一度話すこともできます' : 'ボタンを押して、声に出してみましょう'}</p>
+      <p class="pron-note">押している間ずっと聞き取ります。話し終わったら停止ボタンを押してください。</p>`;
+  }
+
+  function draw() {
+    const busy = state === 'listening';
     host.innerHTML = `
       <div class="card">
         <p class="pron-target">${esc(current.en)}</p>
         <p class="pron-ja">${esc(current.ja)}</p>
 
         <div class="btn-row" style="justify-content:center;margin-bottom:22px">
-          <button class="btn" data-listen-model>🔊 手本を聞く</button>
-          <button class="btn" data-slow>🐢 ゆっくり聞く</button>
+          <button class="btn" data-listen-model ${busy ? 'disabled' : ''}>🔊 手本を聞く</button>
+          <button class="btn" data-slow ${busy ? 'disabled' : ''}>🐢 ゆっくり聞く</button>
         </div>
 
-        ${
-          canListen
-            ? `<button class="mic-btn${listening ? ' is-listening' : ''}" data-mic aria-label="録音して判定">${listening ? '■' : '🎤'}</button>
-               <p class="muted" style="text-align:center;margin-top:10px">${listening ? '聞き取り中です。話してください…' : 'ボタンを押して、声に出してみましょう'}</p>`
-            : `<div class="callout warn"><h3>この端末では音声認識が使えません</h3>
-               <p style="margin:0">音声認識は Google Chrome か Safari でご利用いただけます。手本を聞いて口に出す練習はこのままできます。</p></div>`
-        }
+        ${micArea()}
 
         <div id="pron-result">${resultHtml}</div>
 
         <div class="btn-row" style="justify-content:center;margin-top:22px">
-          <button class="btn btn-primary" data-next>次のお題 →</button>
+          <button class="btn btn-primary" data-next ${busy ? 'disabled' : ''}>次のお題 →</button>
         </div>
       </div>`;
 
     host.querySelector('[data-listen-model]').addEventListener('click', () => speak(current.en));
-    host.querySelector('[data-slow]').addEventListener('click', () => speak(current.en, { rate: 0.6 }));
+    host.querySelector('[data-slow]').addEventListener('click', () => speak(current.en, { rate: 0.55 }));
     host.querySelector('[data-next]').addEventListener('click', () => {
+      if (state === 'listening') return;
       stopSpeaking();
-      current = pool[Math.floor(Math.random() * pool.length)];
+      pickNext();
+      state = 'idle';
+      resultHtml = '';
       draw();
     });
 
-    const mic = host.querySelector('[data-mic]');
-    if (mic) mic.addEventListener('click', record);
+    host.querySelector('[data-mic]')?.addEventListener('click', begin);
+    host.querySelectorAll('[data-stop]').forEach((b) => b.addEventListener('click', finish));
   }
 
-  async function record() {
-    if (listening) return;
+  function begin() {
     stopSpeaking();
-    listening = true;
+    resultHtml = '';
+    state = 'listening';
     draw();
 
+    const live = host.querySelector('#pron-live');
+
     try {
-      const heard = await listenOnce();
-      listening = false;
-
-      if (!heard) {
-        draw(`<div class="feedback ng"><strong>聞き取れませんでした</strong>もう一度、少し大きめの声でお願いします。</div>`);
-        return;
-      }
-
-      const { score, words } = compareSpeech(current.en, heard);
-      progress.recordPronunciation(score);
-
-      const marked = words
-        .map((w) => `<span class="${w.ok ? 'word-ok' : 'word-ng'}">${esc(w.word)}</span>`)
-        .join(' ');
-
-      const comment =
-        score >= 90 ? 'すばらしい発音です。' :
-        score >= 70 ? 'よく伝わります。赤い単語をもう一度確認しましょう。' :
-        score >= 40 ? '半分伝わっています。ゆっくり区切って練習してみましょう。' :
-        '手本をもう一度聞いて、まねをするところから始めましょう。';
-
-      draw(`
-        <div class="score-ring">${score}<span style="font-size:16px">点</span></div>
-        <p class="heard">認識された内容：<span class="heard-text">${esc(heard)}</span></p>
-        <p class="heard" style="margin-top:8px">${marked}</p>
-        <p class="muted" style="text-align:center;margin-top:10px">${esc(comment)}</p>
-      `);
-    } catch (err) {
-      listening = false;
-      const msg =
-        err.message === 'not-allowed'
-          ? 'マイクの使用が許可されていません。ブラウザの設定をご確認ください。'
-          : 'うまく聞き取れませんでした。もう一度お試しください。';
-      draw(`<div class="feedback ng"><strong>エラー</strong>${esc(msg)}</div>`);
+      session = startListening({
+        onUpdate: (text) => {
+          const el = host.querySelector('#pron-live');
+          if (el) el.textContent = text || '…';
+        },
+        onError: (err) => {
+          session = null;
+          state = 'idle';
+          resultHtml = `<div class="feedback ng"><strong>マイクを使えませんでした</strong>${esc(micErrorMessage(err))}</div>`;
+          draw();
+        }
+      });
+      if (live) live.textContent = '…';
+    } catch {
+      session = null;
+      state = 'idle';
+      resultHtml = `<div class="feedback ng"><strong>音声認識を開始できませんでした</strong>Google Chrome か Safari でお試しください。</div>`;
+      draw();
     }
+  }
+
+  async function finish() {
+    if (state !== 'listening' || !session) return;
+
+    // 二重で押されないよう、先に状態を進める
+    const s = session;
+    session = null;
+    state = 'result';
+
+    const heard = await s.stop();
+
+    if (!heard) {
+      resultHtml = `<div class="feedback ng"><strong>聞き取れませんでした</strong>マイクに少し近づいて、もう一度お試しください。</div>`;
+      draw();
+      return;
+    }
+
+    const { score, words } = compareSpeech(current.en, heard);
+    progress.recordPronunciation(score);
+
+    const marked = words
+      .map((w) => `<span class="${w.ok ? 'word-ok' : 'word-ng'}">${esc(w.word)}</span>`)
+      .join(' ');
+
+    const comment =
+      score >= 90 ? 'すばらしい発音です。' :
+      score >= 70 ? 'よく伝わります。赤い単語をもう一度確認しましょう。' :
+      score >= 40 ? '半分伝わっています。ゆっくり区切って練習してみましょう。' :
+      '手本をもう一度聞いて、まねをするところから始めましょう。';
+
+    resultHtml = `
+      <div class="score-ring">${score}<span style="font-size:16px">点</span></div>
+      <p class="heard">認識された内容：<span class="heard-text">${esc(heard)}</span></p>
+      <p class="heard" style="margin-top:8px">${marked}</p>
+      <p class="muted" style="text-align:center;margin-top:10px">${esc(comment)}</p>`;
+    draw();
+  }
+
+  function micErrorMessage(err) {
+    const kind = err?.message;
+    if (kind === 'not-allowed' || kind === 'service-not-allowed') {
+      return 'マイクの使用が許可されていません。ブラウザのアドレスバーのマイク設定から許可してください。';
+    }
+    if (kind === 'audio-capture') {
+      return 'マイクが見つかりませんでした。接続をご確認ください。';
+    }
+    return 'もう一度お試しください。';
   }
 
   draw();
