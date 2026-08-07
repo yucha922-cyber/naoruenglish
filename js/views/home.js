@@ -1,5 +1,6 @@
 import { phases } from '../data/phrases.js';
 import { symptoms } from '../data/symptoms.js';
+import { phoneTopics } from '../data/phone.js';
 import { muscles } from '../data/muscles.js';
 import { allWords } from '../data/vocabulary.js';
 import { favorites, progress } from '../lib/storage.js';
@@ -19,6 +20,14 @@ export function render() {
 
       <h2 class="section-title">施術の流れから探す</h2>
       <div class="card-grid">
+        <a class="nav-card" href="#/phone">
+          <span class="nav-icon">📞</span>
+          <span class="nav-body">
+            <strong><span class="step-badge">0</span> お電話対応</strong>
+            <span>ご予約・変更・場所のお問い合わせ。来院前の最初の接点です。</span>
+          </span>
+          <span class="nav-arrow">›</span>
+        </a>
         ${phases
           .map(
             (p) => `
@@ -38,6 +47,14 @@ export function render() {
     <section>
       <h2 class="section-title">目的から探す</h2>
       <div class="card-grid two">
+        <a class="nav-card" href="#/phone">
+          <span class="nav-icon">📞</span>
+          <span class="nav-body">
+            <strong>お電話対応</strong>
+            <span>予約・変更・道案内など${phoneTopics.length}場面</span>
+          </span>
+          <span class="nav-arrow">›</span>
+        </a>
         <a class="nav-card" href="#/symptoms">
           <span class="nav-icon">🩹</span>
           <span class="nav-body">

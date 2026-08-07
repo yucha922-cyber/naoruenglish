@@ -1,5 +1,6 @@
 import { allPhrases } from '../data/phrases.js';
 import { allSymptomPhrases } from '../data/symptoms.js';
+import { allPhonePhrases } from '../data/phone.js';
 import { allWords } from '../data/vocabulary.js';
 import { muscles, muscleTalk } from '../data/muscles.js';
 import { favorites } from '../lib/storage.js';
@@ -14,6 +15,9 @@ function corpus() {
   }
   for (const p of allSymptomPhrases()) {
     items.push({ en: p.en, ja: p.ja, note: p.note, meta: `症状別 ／ ${p.source} ／ ${p.group}`, patient: p.kind === 'patient' });
+  }
+  for (const p of allPhonePhrases()) {
+    items.push({ en: p.en, ja: p.ja, note: p.note, meta: `お電話対応 ／ ${p.source} ／ ${p.group}`, patient: p.kind === 'caller' });
   }
   for (const w of allWords()) {
     items.push({ en: w.en, ja: w.ja, note: w.note, meta: `単語集 ／ ${w.source}` });

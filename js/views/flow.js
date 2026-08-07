@@ -3,8 +3,16 @@ import { esc, phraseList, pageHead, callout } from '../lib/ui.js';
 
 export function renderIndex() {
   return `
-    ${pageHead('施術の流れ', '来院から施術プランのご提案まで、順番に並べています。')}
+    ${pageHead('施術の流れ', 'お電話でのお問い合わせから、施術プランのご提案まで順番に並べています。')}
     <div class="card-grid">
+      <a class="nav-card" href="#/phone">
+        <span class="nav-icon">📞</span>
+        <span class="nav-body">
+          <strong><span class="step-badge">0</span> お電話対応</strong>
+          <span>ご予約・変更・場所のお問い合わせ。来院前の最初の接点です。</span>
+        </span>
+        <span class="nav-arrow">›</span>
+      </a>
       ${phases
         .map(
           (p) => `

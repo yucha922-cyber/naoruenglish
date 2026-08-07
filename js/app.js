@@ -9,6 +9,7 @@ import * as symptomsView from './views/symptoms.js';
 import * as words from './views/words.js';
 import * as learn from './views/learn.js';
 import * as simulation from './views/simulation.js';
+import * as phone from './views/phone.js';
 import * as searchView from './views/search.js';
 
 const app = document.getElementById('app');
@@ -38,6 +39,12 @@ route(/^\/$/, () => show(home.render()));
 route(/^\/flow$/, () => show(flow.renderIndex()));
 route(/^\/flow\/([\w-]+)$/, ([id]) => {
   const html = flow.renderDetail(id);
+  html ? show(html) : notFoundPage();
+});
+
+route(/^\/phone$/, () => show(phone.renderIndex()));
+route(/^\/phone\/([\w-]+)$/, ([id]) => {
+  const html = phone.renderDetail(id);
   html ? show(html) : notFoundPage();
 });
 
@@ -83,7 +90,7 @@ setNotFound(notFoundPage);
 /* ---------------- タブの選択状態 ---------------- */
 
 const TAB_MATCH = [
-  ['flow', /^\/flow/],
+  ['flow', /^\/(flow|phone)/],
   ['symptoms', /^\/symptoms/],
   ['words', /^\/(words|muscles)/],
   ['learn', /^\/learn/],
