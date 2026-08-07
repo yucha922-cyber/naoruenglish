@@ -1,5 +1,6 @@
 import { allPhrases } from '../data/phrases.js';
 import { allSymptomPhrases } from '../data/symptoms.js';
+import { allPhonePhrases } from '../data/phone.js';
 import { allWords } from '../data/vocabulary.js';
 import { muscles } from '../data/muscles.js';
 import { scenarios } from '../data/scenarios.js';
@@ -75,7 +76,7 @@ const QUIZ_MODES = {
 const QUIZ_LENGTH = 10;
 
 function phrasePool() {
-  return [...allPhrases(), ...allSymptomPhrases()].filter((p) => p.en && p.ja);
+  return [...allPhrases(), ...allSymptomPhrases(), ...allPhonePhrases()].filter((p) => p.en && p.ja);
 }
 
 function buildPhraseQuestion(pool) {
@@ -286,13 +287,13 @@ export function mountQuiz(root, mode = 'all') {
 function pronPool(source) {
   if (source === 'favorites') {
     const saved = new Set(favorites.list());
-    const all = [...allPhrases(), ...allSymptomPhrases(), ...allWords(), ...muscles];
+    const all = [...allPhrases(), ...allSymptomPhrases(), ...allPhonePhrases(), ...allWords(), ...muscles];
     return all.filter((x) => saved.has(x.en)).map((x) => ({ en: x.en, ja: x.ja }));
   }
   if (source === 'muscle') return muscles.map((m) => ({ en: m.en, ja: `${m.ja}（${m.kana}）` }));
   if (source === 'word') return allWords().map((w) => ({ en: w.en, ja: w.ja }));
-  return [...allPhrases(), ...allSymptomPhrases()]
-    .filter((p) => p.kind === 'therapist')
+  return [...allPhrases(), ...allSymptomPhrases(), ...allPhonePhrases()]
+    .filter((p) => p.kind === 'therapist' || p.kind === 'staff')
     .map((p) => ({ en: p.en, ja: p.ja }));
 }
 
