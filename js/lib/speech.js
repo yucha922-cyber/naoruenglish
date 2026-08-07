@@ -172,45 +172,94 @@ export function stopSpeaking() {
   clearBtn();
 }
 
+// マイクを使えないときのエラー。再開しても意味がないので即座に諦める。
+const FATAL_MIC_ERRORS = ['not-allowed', 'service-not-allowed', 'audio-capture'];
+
 /**
- * 一度だけ英語を聞き取る。
- * @returns {Promise<string>} 認識されたテキスト
+ * 停止ボタンを押すまで聞き取り続けるセッションを開始する。
+ *
+ * ブラウザは無音が続くと勝手に認識を終了してしまうため、
+ * 利用者が止めるまでは自動で再開する。
+ * これにより、ゆっくり区切って話しても途中で打ち切られない。
+ *
+ * @param {{onUpdate?: (text: string) => void, onError?: (err: Error) => void}} handlers
+ * @returns {{stop: () => Promise<string>}}
  */
-export function listenOnce({ onStart, onEnd } = {}) {
-  return new Promise((resolve, reject) => {
-    if (!canListen) {
-      reject(new Error('unsupported'));
+export function startListening({ onUpdate, onError } = {}) {
+  if (!canListen) throw new Error('unsupported');
+
+  const rec = new SR();
+  rec.lang = 'en-US';
+  rec.continuous = true;
+  rec.interimResults = true;
+  rec.maxAlternatives = 1;
+
+  let finalText = '';
+  let interimText = '';
+  let stopped = false;
+  let restarts = 0;
+
+  const currentText = () => (finalText + interimText).replace(/\s+/g, ' ').trim();
+
+  rec.onresult = (e) => {
+    interimText = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const r = e.results[i];
+      if (r.isFinal) finalText += r[0].transcript + ' ';
+      else interimText += r[0].transcript + ' ';
+    }
+    onUpdate?.(currentText());
+  };
+
+  rec.onerror = (e) => {
+    const kind = e.error || 'error';
+    // 無音や中断は想定内。onend の再開に任せる
+    if (kind === 'no-speech' || kind === 'aborted') return;
+    if (FATAL_MIC_ERRORS.includes(kind)) {
+      stopped = true;
+      onError?.(new Error(kind));
+    }
+  };
+
+  rec.onend = () => {
+    if (stopped) return;
+    // 無音で終了しただけなので再開する。暴走を防ぐため回数を制限する
+    if (restarts >= 60) {
+      stopped = true;
       return;
     }
-    const rec = new SR();
-    rec.lang = 'en-US';
-    rec.interimResults = false;
-    rec.maxAlternatives = 3;
-    rec.continuous = false;
-
-    let done = false;
-
-    rec.onstart = () => onStart?.();
-    rec.onresult = (e) => {
-      done = true;
-      const alts = Array.from(e.results[0]).map((a) => a.transcript);
-      resolve(alts[0] || '');
-    };
-    rec.onerror = (e) => {
-      done = true;
-      reject(new Error(e.error || 'error'));
-    };
-    rec.onend = () => {
-      onEnd?.();
-      if (!done) resolve('');
-    };
-
+    restarts += 1;
     try {
       rec.start();
-    } catch (err) {
-      reject(err);
+    } catch {
+      stopped = true;
     }
-  });
+  };
+
+  try {
+    rec.start();
+  } catch (err) {
+    stopped = true;
+    onError?.(err);
+  }
+
+  return {
+    /** 聞き取りを終えて、認識できた文字列を返す */
+    stop() {
+      return new Promise((resolve) => {
+        stopped = true;
+        const finish = () => resolve(currentText());
+        rec.onend = finish;
+        // 停止直後に確定結果が届くことがあるので少し待つ
+        setTimeout(finish, 800);
+        try {
+          rec.stop();
+        } catch {
+          finish();
+        }
+      });
+    }
+  };
 }
 
 /** 比較用に正規化する（記号と大文字小文字を無視） */
