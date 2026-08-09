@@ -1,9 +1,274 @@
 // 会話シミュレーション用シナリオ
 // 患者様（パソコン側）の発言に対して、最適な返答を3択から選びます。
+// section: 対応する学習範囲のID（お電話対応・施術の流れの各パート）
 
 export const scenarios = [
   {
+    id: 'phone-change',
+    section: 'phone-change',
+    title: '【電話】予約を変更したい',
+    level: '初級',
+    icon: '🔄',
+    description: '最も多い問い合わせです。予約の特定 → 変更先の提案 → 復唱まで通しで練習します。',
+    patientProfile: 'Emily / お電話 / 木曜のご予約を変更したい / 日付があいまい',
+    steps: [
+      {
+        patient: { en: 'Hi, I need to change my appointment this week.', ja: 'もしもし、今週の予約を変更したいのですが。' },
+        hint: 'まず快く受けてから、お名前を伺いましょう。',
+        options: [
+          { en: 'Of course. May I have your name, please?', ja: 'かしこまりました。お名前を伺えますか。', correct: true, feedback: '完璧です。「Of course」で先に安心させてから本題に入っています。' },
+          { en: 'Why do you want to change it?', ja: 'なぜ変更したいのですか。', correct: false, feedback: '理由を問いただす必要はありません。相手を責めているように聞こえます。' },
+          { en: 'Changing is difficult.', ja: '変更は難しいです。', correct: false, feedback: 'まだ何も確認していません。最初から断ってはいけません。' }
+        ]
+      },
+      {
+        patient: { en: 'It\'s Emily Schneider.', ja: 'エミリー・シュナイダーです。' },
+        hint: '聞き慣れない苗字です。つづりを確認しましょう。',
+        options: [
+          { en: 'Thank you. Could you spell your last name for me?', ja: 'ありがとうございます。苗字のつづりをお願いできますか。', correct: true, feedback: '正解です。電話で最も間違えるのが名前。必ずつづりを確認してください。' },
+          { en: 'Okay, Emily Snider. Got it.', ja: 'はい、エミリー・スナイダーですね。', correct: false, feedback: '聞き取れたつもりで進むのが一番危険です。予約が見つからなくなります。' },
+          { en: 'Sorry, I cannot understand your name.', ja: 'すみません、お名前がわかりません。', correct: false, feedback: '突き放しています。「つづりを教えてください」と聞けば解決します。' }
+        ]
+      },
+      {
+        patient: { en: 'Sure. S-C-H-N-E-I-D-E-R.', ja: 'はい。S-C-H-N-E-I-D-E-R です。' },
+        hint: '復唱してから、予約を探しましょう。',
+        options: [
+          { en: 'S-C-H-N-E-I-D-E-R. Thank you. Let me find your booking.', ja: 'S-C-H-N-E-I-D-E-R ですね。ありがとうございます。ご予約をお調べします。', correct: true, feedback: '復唱してから確認へ。この一手間が予約ミスを防ぎます。' },
+          { en: 'Okay. Please wait.', ja: 'はい。お待ちください。', correct: false, feedback: '復唱がありません。また「Please wait」だけだと少しぶっきらぼうです。' },
+          { en: 'Can you say it again more slowly?', ja: 'もう一度ゆっくり言ってもらえますか。', correct: false, feedback: '1文字ずつ言ってくれています。聞き返すより復唱で確認しましょう。' }
+        ]
+      },
+      {
+        patient: { en: 'I think it was Thursday? Or maybe Friday. I\'m not sure.', ja: '木曜だったかな。金曜かも。よく覚えていません。' },
+        hint: 'あいまいでも大丈夫です。こちらで調べて提示しましょう。',
+        options: [
+          { en: 'No problem, I can see it here. You\'re booked for Thursday at two.', ja: '大丈夫です、こちらで確認できました。木曜2時のご予約ですね。', correct: true, feedback: '相手に思い出させず、こちらが答えを出す。これが一番親切です。' },
+          { en: 'You need to know your appointment date.', ja: 'ご予約日は把握しておいてください。', correct: false, feedback: '正論ですが、電話でこれを言うと確実に印象が悪くなります。' },
+          { en: 'Please check your email and call us back.', ja: 'メールを確認して、かけ直してください。', correct: false, feedback: 'こちらで調べられます。二度手間をかけさせないでください。' }
+        ]
+      },
+      {
+        patient: { en: 'Oh right, Thursday at two. Can I move it to next week?', ja: 'そうそう、木曜2時です。来週に動かせますか。' },
+        hint: '希望を具体的に聞き出しましょう。',
+        options: [
+          { en: 'Certainly. What day and time would suit you best?', ja: 'もちろんです。ご希望の曜日とお時間はございますか。', correct: true, feedback: '曜日と時間を一度に聞けています。やり取りの往復が減ります。' },
+          { en: 'Next week is probably full.', ja: '来週はたぶん埋まっています。', correct: false, feedback: '調べる前に「たぶん」で答えてはいけません。' },
+          { en: 'Yes. Bye.', ja: 'はい。では。', correct: false, feedback: '変更先が決まっていません。会話が成立していません。' }
+        ]
+      },
+      {
+        patient: { en: 'Would Wednesday afternoon work?', ja: '水曜の午後は空いていますか。' },
+        hint: 'あいにく埋まっています。断って終わらせず、代案を出しましょう。',
+        options: [
+          { en: 'I\'m afraid Wednesday is fully booked. We have Tuesday at three, or Thursday at eleven.', ja: '申し訳ございません、水曜は満席です。火曜3時か木曜11時が空いております。', correct: true, feedback: '理想的です。断りと代案をひと息で。しかも候補を2つ出しています。' },
+          { en: 'No, Wednesday is full.', ja: 'いいえ、水曜は満席です。', correct: false, feedback: '事実ですが、ここで会話が止まります。代案を必ず添えてください。' },
+          { en: 'Wednesday is full, so please call again next month.', ja: '水曜は満席なので、来月またお電話ください。', correct: false, feedback: '来週の他の日を提案すべきです。予約を逃しています。' }
+        ]
+      },
+      {
+        patient: { en: 'Thursday at eleven sounds good.', ja: '木曜11時でお願いします。' },
+        hint: '変更を確定し、必ず復唱してください。',
+        options: [
+          { en: 'I\'ve moved you to Thursday the twenty-second, at eleven. Is that correct?', ja: '22日木曜11時に変更いたしました。お間違いないでしょうか。', correct: true, feedback: '曜日・日付・時刻をすべて含めた復唱。ここまでやれば予約事故は起きません。' },
+          { en: 'Okay, done.', ja: 'はい、完了です。', correct: false, feedback: '復唱がありません。「木曜」と「火曜」の取り違えはここで起きます。' },
+          { en: 'Thursday. Okay.', ja: '木曜ですね。はい。', correct: false, feedback: '日付と時刻が抜けています。曜日だけでは足りません。' }
+        ]
+      },
+      {
+        patient: { en: 'Perfect, thank you so much!', ja: '完璧です、ありがとうございます。' },
+        hint: '最後に気持ちよく締めましょう。',
+        options: [
+          { en: 'You\'re very welcome. We look forward to seeing you on Thursday.', ja: 'とんでもございません。木曜日にお待ちしております。', correct: true, feedback: '最後にもう一度曜日を言うことで、記憶に残ります。' },
+          { en: 'Okay. Goodbye.', ja: 'はい。さようなら。', correct: false, feedback: '間違いではありませんが、そっけない印象で終わってしまいます。' },
+          { en: 'Please do not change it again.', ja: 'もう変更しないでくださいね。', correct: false, feedback: '冗談のつもりでも、電話では表情が見えず角が立ちます。' }
+        ]
+      }
+    ]
+  },
+
+  {
+    id: 'phone-booking',
+    section: 'phone-booking',
+    title: '【電話】新規のご予約を受ける',
+    level: '初級',
+    icon: '🗓️',
+    description: '初めての方からのご予約。日時の確定と、初回のご案内まで。',
+    patientProfile: 'Tom / お電話 / 当院は初めて / 肩こりでお困り',
+    steps: [
+      {
+        patient: { en: 'Hello, do you speak English? I\'d like to book a massage.', ja: 'もしもし、英語は通じますか。予約を取りたいのですが。' },
+        hint: 'まず「大丈夫です」と安心させましょう。',
+        options: [
+          { en: 'Yes, we can help you in English. Have you visited us before?', ja: 'はい、英語で対応できます。当院のご利用は初めてですか。', correct: true, feedback: '完璧です。安心させてから、初回かどうかの確認に進んでいます。' },
+          { en: 'A little.', ja: '少しだけ。', correct: false, feedback: '相手を不安にさせます。「対応できます」と言い切りましょう。' },
+          { en: 'We are a seitai clinic, not a massage shop.', ja: 'うちはマッサージ店ではなく整体院です。', correct: false, feedback: '訂正から入ると冷たく響きます。予約を受けてから説明できます。' }
+        ]
+      },
+      {
+        patient: { en: 'No, it\'s my first time. Do you have anything this week?', ja: '初めてです。今週空いていますか。' },
+        hint: '希望を絞り込みましょう。',
+        options: [
+          { en: 'Let me check. Do you prefer the morning or the afternoon?', ja: '確認いたします。午前と午後、どちらがよろしいですか。', correct: true, feedback: '二択で聞くと、相手も答えやすくなります。' },
+          { en: 'What day? What time? What is your name?', ja: '何曜日。何時。お名前は。', correct: false, feedback: '一度に3つ聞くと、電話では必ず混乱します。一つずつ。' },
+          { en: 'We are very busy this week.', ja: '今週は混んでいます。', correct: false, feedback: '調べる前に諦めさせています。' }
+        ]
+      },
+      {
+        patient: { en: 'Afternoon would be better. I finish work at five.', ja: '午後がいいです。5時に仕事が終わります。' },
+        hint: '勤務時間を踏まえた提案をしましょう。',
+        options: [
+          { en: 'We have Friday at six, or Saturday at two. Would either work?', ja: '金曜6時か土曜2時が空いております。いかがでしょうか。', correct: true, feedback: '5時終業を踏まえた時間を提案できています。よく聞けています。' },
+          { en: 'We have Tuesday at ten in the morning.', ja: '火曜の午前10時が空いています。', correct: false, feedback: '午後希望と伝えられています。話を聞けていません。' },
+          { en: 'What time do you want?', ja: '何時がいいですか。', correct: false, feedback: 'こちらから候補を出すほうが早く決まります。' }
+        ]
+      },
+      {
+        patient: { en: 'Friday at six is great.', ja: '金曜6時でお願いします。' },
+        hint: 'お名前と連絡先を伺いましょう。',
+        options: [
+          { en: 'May I have your name and a phone number, please?', ja: 'お名前とお電話番号を伺えますか。', correct: true, feedback: '予約に必要な情報を過不足なく聞けています。' },
+          { en: 'Okay, see you Friday.', ja: 'では金曜に。', correct: false, feedback: '名前も連絡先も聞いていません。予約が成立しません。' },
+          { en: 'Please send us an email with your details.', ja: '詳細はメールで送ってください。', correct: false, feedback: '今この電話で聞けば済みます。手間をかけさせないでください。' }
+        ]
+      },
+      {
+        patient: { en: 'Tom Baker. My number is 090-1234-5678.', ja: 'トム・ベイカーです。番号は090-1234-5678です。' },
+        hint: '番号は必ず復唱してください。',
+        options: [
+          { en: 'Let me read that back. Zero-nine-zero, one-two-three-four, five-six-seven-eight.', ja: '復唱します。090-1234-5678。', correct: true, feedback: '1桁ずつ読み返す。これで番号の聞き間違いはなくなります。' },
+          { en: 'Got it, thank you.', ja: '承知しました。', correct: false, feedback: '復唱がありません。連絡がつかなくなるリスクがあります。' },
+          { en: 'Is that a mobile phone?', ja: '携帯電話ですか。', correct: false, feedback: '確認としては悪くありませんが、まず復唱が先です。' }
+        ]
+      },
+      {
+        patient: { en: 'That\'s right. Is there anything I should know?', ja: 'その通りです。何か知っておくことはありますか。' },
+        hint: '初回の方に必要な案内をしましょう。',
+        options: [
+          { en: 'The first session takes about sixty minutes. Please come ten minutes early for the form.', ja: '初回は60分ほどです。問診票のご記入がありますので10分前にお越しください。', correct: true, feedback: '所要時間と早めの来院。初回に必要な情報をきちんと伝えています。' },
+          { en: 'No, nothing. See you Friday.', ja: '特にありません。金曜に。', correct: false, feedback: '初回の方は不安です。伝えるべきことがあります。' },
+          { en: 'Please bring your health insurance card.', ja: '保険証をお持ちください。', correct: false, feedback: '整体は保険適用外です。誤解を招きます。' }
+        ]
+      }
+    ]
+  },
+
+  {
+    id: 'phone-directions',
+    section: 'phone-access',
+    title: '【電話】道に迷った方への案内',
+    level: '中級',
+    icon: '🗺️',
+    description: '駅に着いたけれど場所がわからない、という電話。焦っている相手を落ち着かせます。',
+    patientProfile: 'Anna / お電話 / 駅に到着済み / 予約時刻が迫っている',
+    steps: [
+      {
+        patient: { en: 'Hi, I\'m at the station but I can\'t find your place. I think I\'m lost.', ja: 'もしもし、駅にいるのですが場所がわかりません。迷ったみたいです。' },
+        hint: 'まず落ち着かせて、現在地を特定しましょう。',
+        options: [
+          { en: 'No problem at all, we\'ll find you. Are you inside the station or outside?', ja: '大丈夫ですよ、ご案内します。駅の中ですか、外ですか。', correct: true, feedback: '安心させてから位置の特定へ。焦っている方への理想的な対応です。' },
+          { en: 'Our address is 3-14-2 Sakura-cho, Naka-ku.', ja: '住所は中区桜町3-14-2です。', correct: false, feedback: '日本の番地は外国の方にはまず伝わりません。目印で案内しましょう。' },
+          { en: 'You are late. Please hurry.', ja: '遅刻ですよ。急いでください。', correct: false, feedback: '迷っている方をさらに焦らせています。' }
+        ]
+      },
+      {
+        patient: { en: 'I\'m outside. I see a big bank in front of me.', ja: '外です。目の前に大きな銀行が見えます。' },
+        hint: '出口を特定しましょう。',
+        options: [
+          { en: 'Great, that\'s the East Exit. Can you see a convenience store on your left?', ja: 'そちらは東口ですね。左手にコンビニは見えますか。', correct: true, feedback: '目印から出口を特定し、次の目印へ。電話の道案内はこの積み重ねです。' },
+          { en: 'Which exit did you use?', ja: 'どの出口から出ましたか。', correct: false, feedback: '迷っている方は出口の名前を知りません。目印から逆算しましょう。' },
+          { en: 'Go north for two hundred meters.', ja: '北へ200メートル進んでください。', correct: false, feedback: '方角は歩行者には伝わりません。目印を使ってください。' }
+        ]
+      },
+      {
+        patient: { en: 'Yes! I can see it.', ja: 'はい、見えます。' },
+        hint: '曲がる回数は少なく。一度に伝えるのは1〜2手までです。',
+        options: [
+          { en: 'Perfect. Walk past the convenience store and go straight for two minutes.', ja: 'そのコンビニを通り過ぎて、2分ほどまっすぐ歩いてください。', correct: true, feedback: '一度に一つの指示。電話ではこれが正解です。' },
+          { en: 'Turn left, then right, then left again at the third light, then cross the bridge.', ja: '左に曲がって、右、3つ目の信号をまた左、橋を渡ってください。', correct: false, feedback: '多すぎます。電話で覚えられるのは1〜2手までです。' },
+          { en: 'Just use Google Maps.', ja: 'グーグルマップを使ってください。', correct: false, feedback: '地図を送るのは有効ですが、突き放す言い方は避けましょう。' }
+        ]
+      },
+      {
+        patient: { en: 'Okay, I\'m walking... I don\'t see anything.', ja: '歩いています…何も見当たりません。' },
+        hint: '口頭で難しければ、地図を送るのが最も確実です。',
+        options: [
+          { en: 'Let me send you a map link by text. Is this number okay?', ja: '地図のリンクをSMSでお送りします。この番号でよろしいですか。', correct: true, feedback: '最も確実な解決策です。早めに切り替える判断が素晴らしい。' },
+          { en: 'You must have gone the wrong way.', ja: '道を間違えたんでしょう。', correct: false, feedback: '相手のせいにしています。解決に向かっていません。' },
+          { en: 'Keep walking, you will see it.', ja: '歩き続ければ見えます。', correct: false, feedback: '根拠がありません。不安が増すだけです。' }
+        ]
+      },
+      {
+        patient: { en: 'Got it! I see the blue sign now. Sorry for the trouble.', ja: '届きました。青い看板が見えます。お手数をおかけしました。' },
+        hint: '謝らせないことが大切です。',
+        options: [
+          { en: 'No trouble at all. Take your time, we\'re waiting for you.', ja: 'とんでもございません。ごゆっくりお越しください。お待ちしております。', correct: true, feedback: '相手の負い目を消しています。来院前から良い関係が作れています。' },
+          { en: 'Yes, it was difficult to explain.', ja: 'はい、説明が大変でした。', correct: false, feedback: '相手を責めているように聞こえます。' },
+          { en: 'Please be on time next visit.', ja: '次回は時間通りにお願いします。', correct: false, feedback: '道に迷っただけです。責める場面ではありません。' }
+        ]
+      }
+    ]
+  },
+
+  {
+    id: 'phone-inquiry',
+    section: 'phone-inquiry',
+    title: '【電話】料金と保険のお問い合わせ',
+    level: '中級',
+    icon: '💬',
+    description: '保険が使えないことを、がっかりさせずに伝える練習です。',
+    patientProfile: 'Mark / お電話 / 料金と保険適用を確認したい',
+    steps: [
+      {
+        patient: { en: 'Hi, how much does a session cost?', ja: 'もしもし、1回いくらですか。' },
+        hint: '税込かどうかまで伝えましょう。',
+        options: [
+          { en: 'The first session is six thousand yen, tax included.', ja: '初回は税込6000円です。', correct: true, feedback: '税込と明示するのが大切です。あとのトラブルを防げます。' },
+          { en: 'Six thousand. Maybe more.', ja: '6000円。もっとかかるかも。', correct: false, feedback: 'あいまいな料金案内は不信感につながります。' },
+          { en: 'It depends on your condition.', ja: '症状によります。', correct: false, feedback: '基本料金は答えられるはずです。まず提示しましょう。' }
+        ]
+      },
+      {
+        patient: { en: 'And after that? Is it the same price every time?', ja: 'その後は。毎回同じ料金ですか。' },
+        hint: '2回目以降の料金も伝えましょう。',
+        options: [
+          { en: 'After that it\'s five thousand yen per session.', ja: '2回目以降は1回5000円です。', correct: true, feedback: '明確です。聞かれる前に言えるとなお良いです。' },
+          { en: 'Please ask when you come.', ja: '来院時にお尋ねください。', correct: false, feedback: '電話で答えられる内容です。先送りしないでください。' },
+          { en: 'Yes, always six thousand.', ja: 'はい、常に6000円です。', correct: false, feedback: '事実と違います。料金の誤案内は最も避けるべきです。' }
+        ]
+      },
+      {
+        patient: { en: 'Can I use my Japanese health insurance?', ja: '日本の健康保険は使えますか。' },
+        hint: '使えません。しかし言い方で印象が変わります。',
+        options: [
+          { en: 'I\'m afraid not. Seitai isn\'t covered by health insurance in Japan.', ja: '申し訳ございませんが、整体は日本の健康保険の対象外です。', correct: true, feedback: '「I\'m afraid」で和らげつつ、理由も添えています。理想的です。' },
+          { en: 'No.', ja: 'いいえ。', correct: false, feedback: '事実ですが、これだけだと冷たく響きます。' },
+          { en: 'Maybe. You can try asking your insurance company.', ja: 'たぶん。保険会社に聞いてみてください。', correct: false, feedback: 'あいまいな回答は期待させてしまいます。はっきり伝えましょう。' }
+        ]
+      },
+      {
+        patient: { en: 'Oh, that\'s a shame. I have private travel insurance though.', ja: '残念です。ただ、海外旅行保険には入っています。' },
+        hint: '断定できないことは、できることに置き換えて答えましょう。',
+        options: [
+          { en: 'We can give you a receipt, so you could check with them.', ja: '領収書をお出しできますので、保険会社にご確認いただけます。', correct: true, feedback: '素晴らしい。断定を避けつつ、こちらができることを提示しています。' },
+          { en: 'Yes, travel insurance will definitely cover it.', ja: 'はい、旅行保険なら必ず使えます。', correct: false, feedback: '保険会社によります。断定してはいけません。' },
+          { en: 'We don\'t know anything about insurance.', ja: '保険のことはわかりません。', correct: false, feedback: '領収書は出せます。できることを伝えましょう。' }
+        ]
+      },
+      {
+        patient: { en: 'That helps, thanks. Let me think about it.', ja: '助かります。少し考えてみます。' },
+        hint: '押さずに、扉を開けたまま終わりましょう。',
+        options: [
+          { en: 'Of course. Please feel free to call us anytime.', ja: 'もちろんです。いつでもお気軽にお電話ください。', correct: true, feedback: '押し売りせず、次につながる終わり方です。' },
+          { en: 'We have only one slot left today. Please decide now.', ja: '本日残り1枠です。今お決めください。', correct: false, feedback: '急かすと逆効果です。信頼を失います。' },
+          { en: 'Okay. Bye.', ja: 'はい。では。', correct: false, feedback: '間違いではありませんが、再度の連絡につながりません。' }
+        ]
+      }
+    ]
+  },
+  {
     id: 'first-visit',
+    section: 'flow-greeting',
     title: '初回来院：肩こりのお客様',
     level: '初級',
     icon: '👋',
@@ -78,6 +343,7 @@ export const scenarios = [
 
   {
     id: 'low-back-intake',
+    section: 'flow-intake',
     title: '腰痛の問診',
     level: '中級',
     icon: '🦴',
@@ -143,6 +409,7 @@ export const scenarios = [
 
   {
     id: 'assessment-explain',
+    section: 'flow-assessment',
     title: '検査から状態説明まで',
     level: '中級',
     icon: '🔍',
@@ -208,6 +475,7 @@ export const scenarios = [
 
   {
     id: 'plan-proposal',
+    section: 'flow-plan',
     title: '施術プランのご提案',
     level: '上級',
     icon: '🗓️',
@@ -273,6 +541,7 @@ export const scenarios = [
 
   {
     id: 'refer-out',
+    section: 'flow-explanation',
     title: '医療機関をおすすめする場面',
     level: '上級',
     icon: '🏥',

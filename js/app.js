@@ -1,6 +1,7 @@
 import { route, start, resolve, setNotFound, currentPath } from './lib/router.js';
 import { favorites, progress, settings } from './lib/storage.js';
 import { speak, stopSpeaking, canSpeak, canListen, englishVoices, loadVoices, isRecommended } from './lib/speech.js';
+import { isValidScope } from './data/scopes.js';
 import { esc } from './lib/ui.js';
 
 import * as home from './views/home.js';
@@ -64,13 +65,18 @@ route(/^\/muscles$/, (_, q) => show(words.renderMuscles(q.get('region') || 'all'
 route(/^\/learn$/, () => show(learn.renderHub()));
 route(/^\/learn\/quiz$/, (_, q) => {
   const mode = q.get('mode') || 'all';
-  show(learn.renderQuiz(mode), (root) => learn.mountQuiz(root, mode));
+  const scope = isValidScope(q.get('scope')) ? q.get('scope') || 'all' : 'all';
+  show(learn.renderQuiz(mode, scope), (root) => learn.mountQuiz(root, mode, scope));
 });
 route(/^\/learn\/pronunciation$/, (_, q) => {
   const src = q.get('from') || 'phrase';
-  show(learn.renderPronunciation(src), (root) => learn.mountPronunciation(root, src));
+  const scope = isValidScope(q.get('scope')) ? q.get('scope') || 'all' : 'all';
+  show(learn.renderPronunciation(src, scope), (root) => learn.mountPronunciation(root, src, scope));
 });
-route(/^\/learn\/simulation$/, () => show(simulation.renderIndex()));
+route(/^\/learn\/simulation$/, (_, q) => {
+  const scope = isValidScope(q.get('scope')) ? q.get('scope') || 'all' : 'all';
+  show(simulation.renderIndex(scope), (root) => simulation.mountIndex(root));
+});
 route(/^\/learn\/simulation\/([\w-]+)$/, ([id]) => {
   const html = simulation.renderScenario(id);
   if (!html) return notFoundPage();

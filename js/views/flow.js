@@ -1,5 +1,6 @@
 import { phases } from '../data/phrases.js';
-import { esc, phraseList, pageHead, callout } from '../lib/ui.js';
+import { scenarios } from '../data/scenarios.js';
+import { esc, phraseList, pageHead, callout, practiceLinks } from '../lib/ui.js';
 
 export function renderIndex() {
   return `
@@ -58,6 +59,10 @@ export function renderDetail(id) {
       <p class="muted" style="margin:-4px 0 10px">聞き取れるようにしておくと、会話が一気に楽になります。</p>
       ${phraseList(phase.patientPhrases, { patient: true })}
     </section>
+
+    ${practiceLinks(`flow-${phase.id}`, {
+      simulation: scenarios.some((s) => s.section === `flow-${phase.id}`)
+    })}
 
     <div class="btn-row" style="margin-top:28px">
       ${prev ? `<a class="btn" href="#/flow/${prev.id}">← ${esc(prev.title)}</a>` : ''}

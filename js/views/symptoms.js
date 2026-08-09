@@ -1,6 +1,6 @@
 import { symptoms, symptomCategories } from '../data/symptoms.js';
 import { muscleByName } from '../data/muscles.js';
-import { esc, phraseList, wordList, pageHead, callout } from '../lib/ui.js';
+import { esc, phraseList, wordList, pageHead, callout, practiceLinks } from '../lib/ui.js';
 
 export function renderIndex(category = 'すべて') {
   const list = category === 'すべて' ? symptoms : symptoms.filter((s) => s.category === category);
@@ -85,5 +85,7 @@ export function renderDetail(id) {
         伝え方は<a href="#/flow/explanation">状態のご説明</a>の「医療機関をすすめる」をご覧ください。
       </p>
     </section>
+
+    ${practiceLinks(`symptom-${s.id}`)}
   `;
 }
