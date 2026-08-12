@@ -4,6 +4,7 @@ import { allPhonePhrases } from '../data/phone.js';
 import { allWords } from '../data/vocabulary.js';
 import { muscles } from '../data/muscles.js';
 import { scenarios } from '../data/scenarios.js';
+import { scopeOptions, scopeContent, speakingPhrases, scopeLabel, scopeHref } from '../data/scopes.js';
 import { progress, favorites } from '../lib/storage.js';
 import { speak, canListen, startListening, compareSpeech, stopSpeaking } from '../lib/speech.js';
 import { esc, pageHead, shuffle, sample, callout } from '../lib/ui.js';
@@ -64,6 +65,41 @@ export function renderHub() {
   `;
 }
 
+/* ============================ 学習範囲の選択 ============================ */
+
+/**
+ * 学習範囲を選ぶプルダウン。
+ * @param {string} scope いま選ばれている範囲のID
+ * @param {(id: string) => string} hrefFor 選択時の遷移先を返す関数
+ */
+function scopePicker(scope, hrefFor) {
+  const options = scopeOptions()
+    .map(
+      (g) => `<optgroup label="${esc(g.group)}">${g.items
+        .map((o) => `<option value="${esc(o.id)}"${o.id === scope ? ' selected' : ''}>${esc(o.label)}</option>`)
+        .join('')}</optgroup>`
+    )
+    .join('');
+
+  const link = scopeHref(scope);
+
+  return `
+    <div class="scope-bar">
+      <label class="scope-label" for="scope-select">練習する範囲</label>
+      <select id="scope-select" data-scope-href="${esc(hrefFor('__ID__'))}">${options}</select>
+      ${link ? `<a class="btn btn-ghost scope-source" href="${esc(link)}">📖 このパートを読む</a>` : ''}
+    </div>`;
+}
+
+/** scopePicker で作ったプルダウンに遷移処理を付ける */
+function bindScopePicker(root) {
+  const sel = root.querySelector('#scope-select');
+  if (!sel) return;
+  sel.addEventListener('change', () => {
+    location.hash = sel.dataset.scopeHref.replace('__ID__', encodeURIComponent(sel.value));
+  });
+}
+
 /* ============================ クイズ ============================ */
 
 const QUIZ_MODES = {
@@ -75,8 +111,8 @@ const QUIZ_MODES = {
 
 const QUIZ_LENGTH = 10;
 
-function phrasePool() {
-  return [...allPhrases(), ...allSymptomPhrases(), ...allPhonePhrases()].filter((p) => p.en && p.ja);
+function phrasePool(scope) {
+  return scopeContent(scope).phrases.filter((p) => p.en && p.ja);
 }
 
 function buildPhraseQuestion(pool) {
@@ -120,10 +156,12 @@ function buildWordQuestion(pool) {
   };
 }
 
-function buildMuscleQuestion() {
-  const target = muscles[Math.floor(Math.random() * muscles.length)];
+function buildMuscleQuestion(pool = muscles) {
+  const target = pool[Math.floor(Math.random() * pool.length)];
+  // 選択肢が足りないときは全体から補う
+  const distractorPool = pool.length >= 4 ? pool : muscles;
   const others = sample(
-    muscles.filter((m) => m.en !== target.en && m.ja !== target.ja),
+    distractorPool.filter((m) => m.en !== target.en && m.ja !== target.ja),
     3
   );
   const jaFirst = Math.random() < 0.5;
@@ -148,44 +186,73 @@ function buildMuscleQuestion() {
   };
 }
 
-function buildQuiz(mode) {
-  const phrases = phrasePool();
-  const words = allWords();
+function buildQuiz(mode, scope) {
+  const content = scopeContent(scope);
+  const phrases = phrasePool(scope);
+  const words = content.words;
+  const pickMuscles = content.muscles;
+
+  // 範囲を絞ると出せない種類が出てくるので、実際に出題できるものだけ使う
+  const available = [];
+  if (phrases.length >= 4) available.push('phrase');
+  if (words.length >= 4) available.push('word');
+  if (pickMuscles.length >= 4) available.push('muscle');
+  if (!available.length) return [];
+
+  const kinds = available.includes(mode) ? [mode] : available;
   const questions = [];
 
   for (let i = 0; i < QUIZ_LENGTH; i++) {
-    let kind = mode;
-    if (mode === 'all') kind = ['phrase', 'word', 'muscle'][i % 3];
-
+    const kind = kinds[i % kinds.length];
     if (kind === 'phrase') questions.push(buildPhraseQuestion(phrases));
     else if (kind === 'word') questions.push(buildWordQuestion(words));
-    else questions.push(buildMuscleQuestion());
+    else questions.push(buildMuscleQuestion(pickMuscles));
   }
   return shuffle(questions);
 }
 
-export function renderQuiz(mode = 'all') {
+export function renderQuiz(mode = 'all', scope = 'all') {
+  const content = scopeContent(scope);
+  const modes = { all: 'すべて' };
+  if (content.phrases.length >= 4) modes.phrase = 'フレーズ';
+  if (content.words.length >= 4) modes.word = '単語';
+  if (content.muscles.length >= 4) modes.muscle = '筋肉名';
+
+  const href = (m) => `#/learn/quiz?mode=${m}&scope=${encodeURIComponent(scope)}`;
+
   return `
-    ${pageHead('✏️ クイズ', `全${QUIZ_LENGTH}問。${QUIZ_MODES[mode] || 'すべて'}から出題します。`, '#/learn')}
-    <div class="chip-row">
-      ${Object.entries(QUIZ_MODES)
-        .map(
-          ([k, label]) =>
-            `<a class="chip${k === mode ? ' is-active' : ''}" href="#/learn/quiz?mode=${k}">${esc(label)}</a>`
-        )
-        .join('')}
-    </div>
+    ${pageHead('✏️ クイズ', `全${QUIZ_LENGTH}問。${scope === 'all' ? 'サイト全体' : scopeLabel(scope)}から出題します。`, '#/learn')}
+
+    ${scopePicker(scope, (id) => `#/learn/quiz?mode=${mode}&scope=${id}`)}
+
+    ${
+      Object.keys(modes).length > 2
+        ? `<div class="chip-row">
+            ${Object.entries(modes)
+              .map(([k, label]) => `<a class="chip${k === mode ? ' is-active' : ''}" href="${href(k)}">${esc(label)}</a>`)
+              .join('')}
+          </div>`
+        : ''
+    }
+
     <div id="quiz-root"></div>
   `;
 }
 
-export function mountQuiz(root, mode = 'all') {
+export function mountQuiz(root, mode = 'all', scope = 'all') {
+  bindScopePicker(root);
+
   const host = root.querySelector('#quiz-root');
   if (!host) return;
 
-  let questions = buildQuiz(mode);
+  let questions = buildQuiz(mode, scope);
   let index = 0;
   let correctCount = 0;
+
+  if (!questions.length) {
+    host.innerHTML = `<p class="empty">この範囲には出題できる項目が足りません。<br>別の範囲をお選びください。</p>`;
+    return;
+  }
 
   function drawQuestion() {
     const q = questions[index];
@@ -272,7 +339,7 @@ export function mountQuiz(root, mode = 'all') {
       </div>`;
 
     host.querySelector('[data-again]').addEventListener('click', () => {
-      questions = buildQuiz(mode);
+      questions = buildQuiz(mode, scope);
       index = 0;
       correctCount = 0;
       drawQuestion();
@@ -284,17 +351,23 @@ export function mountQuiz(root, mode = 'all') {
 
 /* ============================ 発音練習 ============================ */
 
-function pronPool(source) {
+function pronPool(source, scope) {
   if (source === 'favorites') {
     const saved = new Set(favorites.list());
     const all = [...allPhrases(), ...allSymptomPhrases(), ...allPhonePhrases(), ...allWords(), ...muscles];
     return all.filter((x) => saved.has(x.en)).map((x) => ({ en: x.en, ja: x.ja }));
   }
-  if (source === 'muscle') return muscles.map((m) => ({ en: m.en, ja: `${m.ja}（${m.kana}）` }));
-  if (source === 'word') return allWords().map((w) => ({ en: w.en, ja: w.ja }));
-  return [...allPhrases(), ...allSymptomPhrases(), ...allPhonePhrases()]
-    .filter((p) => p.kind === 'therapist' || p.kind === 'staff')
-    .map((p) => ({ en: p.en, ja: p.ja }));
+  if (source === 'muscle') {
+    const list = scopeContent(scope).muscles;
+    const use = list.length ? list : muscles;
+    return use.map((m) => ({ en: m.en, ja: `${m.ja}（${m.kana}）` }));
+  }
+  if (source === 'word') {
+    const list = scopeContent(scope).words;
+    const use = list.length ? list : allWords();
+    return use.map((w) => ({ en: w.en, ja: w.ja }));
+  }
+  return speakingPhrases(scope).map((p) => ({ en: p.en, ja: p.ja }));
 }
 
 const PRON_SOURCES = {
@@ -304,26 +377,42 @@ const PRON_SOURCES = {
   favorites: 'お気に入り'
 };
 
-export function renderPronunciation(source = 'phrase') {
+export function renderPronunciation(source = 'phrase', scope = 'all') {
+  const content = scopeContent(scope);
+  const sources = { phrase: 'フレーズ' };
+  if (content.words.length) sources.word = '単語';
+  if (content.muscles.length) sources.muscle = '筋肉名';
+  sources.favorites = 'お気に入り';
+
+  const scoped = scope !== 'all' && source !== 'favorites';
+
   return `
     ${pageHead('🎤 発音練習', '手本を聞いて、同じように声に出してみましょう。', '#/learn')}
+
+    ${scopePicker(scope, (id) => `#/learn/pronunciation?from=${source}&scope=${id}`)}
+
     <div class="chip-row">
-      ${Object.entries(PRON_SOURCES)
+      ${Object.entries(sources)
         .map(
           ([k, label]) =>
-            `<a class="chip${k === source ? ' is-active' : ''}" href="#/learn/pronunciation?from=${k}">${esc(label)}</a>`
+            `<a class="chip${k === source ? ' is-active' : ''}" href="#/learn/pronunciation?from=${k}&scope=${encodeURIComponent(scope)}">${esc(label)}</a>`
         )
         .join('')}
     </div>
+
+    ${scoped ? `<p class="muted" style="margin:-6px 0 14px">「${esc(scopeLabel(scope))}」のフレーズから出題しています。</p>` : ''}
+
     <div id="pron-root"></div>
   `;
 }
 
-export function mountPronunciation(root, source = 'phrase') {
+export function mountPronunciation(root, source = 'phrase', scope = 'all') {
+  bindScopePicker(root);
+
   const host = root.querySelector('#pron-root');
   if (!host) return;
 
-  const pool = pronPool(source);
+  const pool = pronPool(source, scope);
   if (!pool.length) {
     host.innerHTML = `<p class="empty">この分類にはまだ項目がありません。<br>フレーズに ☆ を付けると、お気に入りから練習できます。</p>`;
     return;

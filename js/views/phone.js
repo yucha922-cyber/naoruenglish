@@ -1,5 +1,6 @@
 import { phoneTopics, phoneTopicById } from '../data/phone.js';
-import { esc, phraseList, pageHead, callout } from '../lib/ui.js';
+import { scenarios } from '../data/scenarios.js';
+import { esc, phraseList, pageHead, callout, practiceLinks } from '../lib/ui.js';
 
 export function renderIndex() {
   return `
@@ -58,6 +59,10 @@ export function renderDetail(id) {
       <p class="muted" style="margin:-4px 0 10px">電話では聞き返しづらいので、先に耳を慣らしておきましょう。</p>
       ${phraseList(topic.callerPhrases, { patient: true })}
     </section>
+
+    ${practiceLinks(`phone-${topic.id}`, {
+      simulation: scenarios.some((s) => s.section === `phone-${topic.id}`)
+    })}
 
     <div class="btn-row" style="margin-top:28px">
       ${prev ? `<a class="btn" href="#/phone/${prev.id}">← ${esc(prev.title)}</a>` : ''}

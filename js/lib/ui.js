@@ -89,3 +89,22 @@ export function shuffle(arr) {
 export function sample(arr, n) {
   return shuffle(arr).slice(0, n);
 }
+
+/**
+ * そのパートだけを練習する導線。フレーズ集の各ページ末尾に置く。
+ * @param {string} scopeId 学習範囲のID（例：phone-change / flow-intake / symptom-headache）
+ * @param {{simulation?: boolean}} opts シミュレーションがある範囲のみリンクを出す
+ */
+export function practiceLinks(scopeId, opts = {}) {
+  const q = encodeURIComponent(scopeId);
+  return `
+    <section class="practice-box">
+      <h2 class="section-title">このパートを練習する</h2>
+      <p class="muted" style="margin:-4px 0 12px">読んだ内容をそのまま、口が動くところまで持っていきましょう。</p>
+      <div class="btn-row">
+        <a class="btn" href="#/learn/quiz?mode=all&scope=${q}">✏️ クイズ</a>
+        <a class="btn" href="#/learn/pronunciation?from=phrase&scope=${q}">🎤 発音練習</a>
+        ${opts.simulation ? `<a class="btn btn-primary" href="#/learn/simulation?scope=${q}">💬 会話シミュレーション</a>` : ''}
+      </div>
+    </section>`;
+}

@@ -1,32 +1,87 @@
 import { scenarios, scenarioById } from '../data/scenarios.js';
 import { progress } from '../lib/storage.js';
 import { speak, stopSpeaking } from '../lib/speech.js';
+import { scopeOptions } from '../data/scopes.js';
 import { esc, pageHead, shuffle } from '../lib/ui.js';
 
-export function renderIndex() {
+const SECTION_GROUPS = [
+  { label: '📞 お電話対応', prefix: 'phone-' },
+  { label: '🩺 施術の流れ', prefix: 'flow-' }
+];
+
+export function renderIndex(scope = 'all') {
   const scores = progress.scenarioScores();
+
+  const card = (s) => {
+    const best = scores[s.id];
+    return `
+      <a class="nav-card" href="#/learn/simulation/${s.id}">
+        <span class="nav-icon">${s.icon}</span>
+        <span class="nav-body">
+          <strong>${esc(s.title)} <span class="tag level-${esc(s.level)}">${esc(s.level)}</span></strong>
+          <span>${esc(s.description)}</span>
+          ${best !== undefined ? `<span style="color:var(--primary)">最高記録 ${best}%</span>` : ''}
+        </span>
+        <span class="nav-arrow">›</span>
+      </a>`;
+  };
+
+  // 特定の範囲が選ばれていれば、そのシナリオだけを出す
+  if (scope !== 'all') {
+    const hit = scenarios.filter((s) => s.section === scope);
+    return `
+      ${pageHead('💬 会話シミュレーション', '患者様の発言に対して、最適な返答を選んでいきます。', '#/learn')}
+      ${scopePicker(scope)}
+      ${
+        hit.length
+          ? `<div class="card-grid">${hit.map(card).join('')}</div>`
+          : `<p class="empty">この範囲のシナリオはまだありません。<br>別の範囲をお選びいただくか、フレーズ集をご覧ください。</p>`
+      }`;
+  }
+
+  const sections = SECTION_GROUPS.map((g) => {
+    const list = scenarios.filter((s) => s.section?.startsWith(g.prefix));
+    if (!list.length) return '';
+    return `
+      <section>
+        <h2 class="section-title">${esc(g.label)}</h2>
+        <div class="card-grid">${list.map(card).join('')}</div>
+      </section>`;
+  }).join('');
 
   return `
     ${pageHead('💬 会話シミュレーション', '患者様の発言に対して、最適な返答を選んでいきます。', '#/learn')}
-
-    <div class="card-grid">
-      ${scenarios
-        .map((s) => {
-          const best = scores[s.id];
-          return `
-        <a class="nav-card" href="#/learn/simulation/${s.id}">
-          <span class="nav-icon">${s.icon}</span>
-          <span class="nav-body">
-            <strong>${esc(s.title)} <span class="tag level-${esc(s.level)}">${esc(s.level)}</span></strong>
-            <span>${esc(s.description)}</span>
-            ${best !== undefined ? `<span style="color:var(--primary)">最高記録 ${best}%</span>` : ''}
-          </span>
-          <span class="nav-arrow">›</span>
-        </a>`;
-        })
-        .join('')}
-    </div>
+    ${scopePicker(scope)}
+    ${sections}
   `;
+}
+
+/** 範囲を選ぶプルダウン（シミュレーションがある範囲だけ出す） */
+function scopePicker(scope) {
+  const withScenario = new Set(scenarios.map((s) => s.section));
+  const groups = scopeOptions()
+    .map((g) => {
+      const items = g.items.filter((o) => o.id === 'all' || withScenario.has(o.id));
+      if (!items.length) return '';
+      return `<optgroup label="${esc(g.group)}">${items
+        .map((o) => `<option value="${esc(o.id)}"${o.id === scope ? ' selected' : ''}>${esc(o.label)}</option>`)
+        .join('')}</optgroup>`;
+    })
+    .join('');
+
+  return `
+    <div class="scope-bar">
+      <label class="scope-label" for="sim-scope">練習する範囲</label>
+      <select id="sim-scope">${groups}</select>
+    </div>`;
+}
+
+export function mountIndex(root) {
+  const sel = root.querySelector('#sim-scope');
+  if (!sel) return;
+  sel.addEventListener('change', () => {
+    location.hash = `#/learn/simulation?scope=${encodeURIComponent(sel.value)}`;
+  });
 }
 
 export function renderScenario(id) {
