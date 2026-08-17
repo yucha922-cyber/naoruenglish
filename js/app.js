@@ -152,6 +152,8 @@ document.addEventListener('click', (e) => {
     document.querySelectorAll(`[data-fav="${CSS.escape(favBtn.dataset.fav)}"]`).forEach((b) => {
       b.classList.toggle('is-on', on);
       if (b.classList.contains('tool-btn')) b.textContent = on ? '★' : '☆';
+      // 文字ラベル付きのボタン（クイズの解説など）
+      else if (b.dataset.favOn) b.textContent = on ? b.dataset.favOn : b.dataset.favOff;
     });
     if (currentPath() === '/favorites') resolve();
     return;
