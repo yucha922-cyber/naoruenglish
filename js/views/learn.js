@@ -124,6 +124,37 @@ function phraseHref(p) {
   return null;
 }
 
+function phraseExplain(p) {
+  return {
+    en: p.en,
+    ja: p.ja,
+    note: p.note,
+    scene: [p.source, p.group].filter(Boolean).join(' ／ '),
+    href: phraseHref(p)
+  };
+}
+
+function wordExplain(w) {
+  return {
+    en: w.en,
+    ja: w.ja,
+    note: w.note,
+    scene: ['単語集', w.source].filter(Boolean).join(' ／ '),
+    href: w.categoryId ? `#/words/${w.categoryId}` : null
+  };
+}
+
+function muscleExplain(m) {
+  return {
+    en: m.en,
+    ja: `${m.ja}（${m.kana}）`,
+    note: m.note,
+    facts: [`作用：${m.action}`, `読み方の目安：${m.kana}`],
+    scene: '筋肉の英語名',
+    href: `#/muscles?region=${m.region}`
+  };
+}
+
 function buildPhraseQuestion(pool) {
   const target = pool[Math.floor(Math.random() * pool.length)];
   const others = sample(
@@ -135,14 +166,12 @@ function buildPhraseQuestion(pool) {
     sub: '日本語に合う英語はどれですか',
     answer: target.en,
     speakOnReveal: target.en,
-    explain: {
-      en: target.en,
-      ja: target.ja,
-      note: target.note,
-      scene: [target.source, target.group].filter(Boolean).join(' ／ '),
-      href: phraseHref(target)
-    },
-    choices: shuffle([target, ...others]).map((p) => ({ label: p.en, value: p.en }))
+    explain: phraseExplain(target),
+    choices: shuffle([target, ...others]).map((p) => ({
+      label: p.en,
+      value: p.en,
+      explain: phraseExplain(p)
+    }))
   };
 }
 
@@ -154,13 +183,7 @@ function buildWordQuestion(pool) {
   );
   const jaFirst = Math.random() < 0.5;
 
-  const explain = {
-    en: target.en,
-    ja: target.ja,
-    note: target.note,
-    scene: ['単語集', target.source].filter(Boolean).join(' ／ '),
-    href: target.categoryId ? `#/words/${target.categoryId}` : null
-  };
+  const picked = shuffle([target, ...others]);
 
   if (jaFirst) {
     return {
@@ -168,8 +191,8 @@ function buildWordQuestion(pool) {
       sub: '日本語に合う英語はどれですか',
       answer: target.en,
       speakOnReveal: target.en,
-      explain,
-      choices: shuffle([target, ...others]).map((w) => ({ label: w.en, value: w.en }))
+      explain: wordExplain(target),
+      choices: picked.map((w) => ({ label: w.en, value: w.en, explain: wordExplain(w) }))
     };
   }
   return {
@@ -177,8 +200,8 @@ function buildWordQuestion(pool) {
     sub: '英語の意味はどれですか',
     answer: target.ja,
     speakOnReveal: target.en,
-    explain,
-    choices: shuffle([target, ...others]).map((w) => ({ label: w.ja, value: w.ja }))
+    explain: wordExplain(target),
+    choices: picked.map((w) => ({ label: w.ja, value: w.ja, explain: wordExplain(w) }))
   };
 }
 
@@ -192,14 +215,7 @@ function buildMuscleQuestion(pool = muscles) {
   );
   const jaFirst = Math.random() < 0.5;
 
-  const explain = {
-    en: target.en,
-    ja: `${target.ja}（${target.kana}）`,
-    note: target.note,
-    facts: [`作用：${target.action}`, `読み方の目安：${target.kana}`],
-    scene: '筋肉の英語名',
-    href: `#/muscles?region=${target.region}`
-  };
+  const picked = shuffle([target, ...others]);
 
   if (jaFirst) {
     return {
@@ -208,8 +224,8 @@ function buildMuscleQuestion(pool = muscles) {
       answer: target.en,
       speakOnReveal: target.en,
       extra: `作用：${target.action}`,
-      explain,
-      choices: shuffle([target, ...others]).map((m) => ({ label: m.en, value: m.en }))
+      explain: muscleExplain(target),
+      choices: picked.map((m) => ({ label: m.en, value: m.en, explain: muscleExplain(m) }))
     };
   }
   return {
@@ -218,8 +234,8 @@ function buildMuscleQuestion(pool = muscles) {
     answer: target.ja,
     speakOnReveal: target.en,
     extra: `カタカナ：${target.kana}`,
-    explain,
-    choices: shuffle([target, ...others]).map((m) => ({ label: m.ja, value: m.ja }))
+    explain: muscleExplain(target),
+    choices: picked.map((m) => ({ label: m.ja, value: m.ja, explain: muscleExplain(m) }))
   };
 }
 
@@ -317,6 +333,41 @@ function answerCard(q) {
     </div>`;
 }
 
+/** 不正解だった選択肢の解説。1問で4つとも覚えられるようにする。 */
+function otherOptions(q) {
+  const others = (q.choices || []).filter((c) => c.value !== q.answer && c.explain);
+  if (!others.length) return '';
+
+  const card = (ex, key) => {
+    const fav = favorites.has(ex.en);
+    const lines = [...(ex.note ? [ex.note] : []), ...(ex.facts || [])];
+    return `
+      <div class="other-card">
+        <div class="other-head">
+          <span class="choice-key">${esc(key)}</span>
+          <p class="other-en">${esc(ex.en)}</p>
+          <div class="other-tools">
+            <button class="tool-btn" data-speak="${esc(ex.en)}" aria-label="読み上げる" title="読み上げる">🔊</button>
+            <button class="tool-btn" data-speak-slow="${esc(ex.en)}" aria-label="ゆっくり読み上げる" title="ゆっくり">🐢</button>
+            <button class="tool-btn${fav ? ' is-on' : ''}" data-fav="${esc(ex.en)}" aria-label="復習リスト" title="復習リスト">${fav ? '★' : '☆'}</button>
+          </div>
+        </div>
+        <p class="other-ja">${esc(ex.ja || '')}</p>
+        ${lines.map((t) => `<p class="other-note">${esc(t)}</p>`).join('')}
+        ${ex.scene ? `<p class="other-scene">使う場面：${esc(ex.scene)}</p>` : ''}
+      </div>`;
+  };
+
+  // 選択肢に振られていた A/B/C/D をそのまま見出しに使う
+  const keyOf = (c) => 'ABCD'[q.choices.indexOf(c)] || '';
+
+  return `
+    <details class="others" open>
+      <summary>ほかの選択肢も覚える（${others.length}件）</summary>
+      <div class="other-list">${others.map((c) => card(c.explain, keyOf(c))).join('')}</div>
+    </details>`;
+}
+
 export function mountQuiz(root, mode = 'all', scope = 'all') {
   bindScopePicker(root);
 
@@ -384,6 +435,8 @@ export function mountQuiz(root, mode = 'all', scope = 'all') {
       </div>
 
       ${answerCard(q)}
+
+      ${otherOptions(q)}
 
       <div class="btn-row" style="margin-top:16px">
         <button class="btn btn-primary" data-next>${isLast ? '結果を見る' : '次の問題 →'}</button>
