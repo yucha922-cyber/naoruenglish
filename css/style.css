@@ -423,6 +423,55 @@ section + section { margin-top: 26px; }
 .feedback.ng { background: var(--danger-light); }
 .feedback strong { display: block; margin-bottom: 4px; }
 
+/* ===== クイズの正解カード ===== */
+.answer-card {
+  margin-top: 14px;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 16px;
+  background: var(--card);
+}
+.answer-label {
+  margin: 0 0 6px;
+  font-size: 11.5px; font-weight: 700; letter-spacing: .08em;
+  color: var(--primary);
+}
+.answer-en {
+  margin: 0 0 4px;
+  font-size: 19px; font-weight: 700; line-height: 1.5;
+}
+.answer-ja { margin: 0 0 14px; font-size: 14px; color: var(--text-soft); }
+
+.answer-tools { margin-bottom: 4px; }
+.answer-tools .btn { font-size: 13px; padding: 8px 13px; }
+.answer-tools .btn.is-on { color: var(--accent); border-color: var(--accent); }
+
+.answer-explain {
+  margin-top: 14px;
+  border-top: 1px solid var(--border);
+  padding-top: 13px;
+}
+.answer-explain h4 {
+  font-size: 13px; margin: 0 0 8px;
+  color: var(--primary);
+}
+.answer-explain p { margin: 0 0 8px; font-size: 13.5px; line-height: 1.7; }
+.answer-scene { color: var(--text-soft); font-size: 12.5px !important; }
+
+.gloss-title { font-size: 12px !important; color: var(--text-faint); margin-bottom: 6px !important; }
+.gloss { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; }
+.gloss li {
+  display: flex; gap: 10px; align-items: baseline;
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+.gloss li b { flex: none; min-width: 36%; }
+.gloss li span { color: var(--text-soft); }
+
+.answer-link { margin-top: 10px; font-size: 12.5px; padding: 7px 12px; }
+
 .score-big { font-size: 40px; font-weight: 700; color: var(--primary); line-height: 1.2; }
 
 /* ===== 発音練習 ===== */

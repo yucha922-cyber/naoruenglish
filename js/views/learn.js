@@ -5,6 +5,7 @@ import { allWords } from '../data/vocabulary.js';
 import { muscles } from '../data/muscles.js';
 import { scenarios } from '../data/scenarios.js';
 import { scopeOptions, scopeContent, speakingPhrases, scopeLabel, scopeHref } from '../data/scopes.js';
+import { glossFor } from '../data/gloss.js';
 import { progress, favorites } from '../lib/storage.js';
 import { speak, canListen, startListening, compareSpeech, stopSpeaking } from '../lib/speech.js';
 import { esc, pageHead, shuffle, sample, callout } from '../lib/ui.js';
@@ -115,6 +116,14 @@ function phrasePool(scope) {
   return scopeContent(scope).phrases.filter((p) => p.en && p.ja);
 }
 
+/** フレーズがサイトのどこに載っているかを返す */
+function phraseHref(p) {
+  if (p.topicId) return `#/phone/${p.topicId}`;
+  if (p.phaseId) return `#/flow/${p.phaseId}`;
+  if (p.symptomId) return `#/symptoms/${p.symptomId}`;
+  return null;
+}
+
 function buildPhraseQuestion(pool) {
   const target = pool[Math.floor(Math.random() * pool.length)];
   const others = sample(
@@ -126,6 +135,13 @@ function buildPhraseQuestion(pool) {
     sub: '日本語に合う英語はどれですか',
     answer: target.en,
     speakOnReveal: target.en,
+    explain: {
+      en: target.en,
+      ja: target.ja,
+      note: target.note,
+      scene: [target.source, target.group].filter(Boolean).join(' ／ '),
+      href: phraseHref(target)
+    },
     choices: shuffle([target, ...others]).map((p) => ({ label: p.en, value: p.en }))
   };
 }
@@ -138,12 +154,21 @@ function buildWordQuestion(pool) {
   );
   const jaFirst = Math.random() < 0.5;
 
+  const explain = {
+    en: target.en,
+    ja: target.ja,
+    note: target.note,
+    scene: ['単語集', target.source].filter(Boolean).join(' ／ '),
+    href: target.categoryId ? `#/words/${target.categoryId}` : null
+  };
+
   if (jaFirst) {
     return {
       prompt: target.ja,
       sub: '日本語に合う英語はどれですか',
       answer: target.en,
       speakOnReveal: target.en,
+      explain,
       choices: shuffle([target, ...others]).map((w) => ({ label: w.en, value: w.en }))
     };
   }
@@ -152,6 +177,7 @@ function buildWordQuestion(pool) {
     sub: '英語の意味はどれですか',
     answer: target.ja,
     speakOnReveal: target.en,
+    explain,
     choices: shuffle([target, ...others]).map((w) => ({ label: w.ja, value: w.ja }))
   };
 }
@@ -166,6 +192,15 @@ function buildMuscleQuestion(pool = muscles) {
   );
   const jaFirst = Math.random() < 0.5;
 
+  const explain = {
+    en: target.en,
+    ja: `${target.ja}（${target.kana}）`,
+    note: target.note,
+    facts: [`作用：${target.action}`, `読み方の目安：${target.kana}`],
+    scene: '筋肉の英語名',
+    href: `#/muscles?region=${target.region}`
+  };
+
   if (jaFirst) {
     return {
       prompt: target.ja,
@@ -173,6 +208,7 @@ function buildMuscleQuestion(pool = muscles) {
       answer: target.en,
       speakOnReveal: target.en,
       extra: `作用：${target.action}`,
+      explain,
       choices: shuffle([target, ...others]).map((m) => ({ label: m.en, value: m.en }))
     };
   }
@@ -182,6 +218,7 @@ function buildMuscleQuestion(pool = muscles) {
     answer: target.ja,
     speakOnReveal: target.en,
     extra: `カタカナ：${target.kana}`,
+    explain,
     choices: shuffle([target, ...others]).map((m) => ({ label: m.ja, value: m.ja }))
   };
 }
@@ -237,6 +274,47 @@ export function renderQuiz(mode = 'all', scope = 'all') {
 
     <div id="quiz-root"></div>
   `;
+}
+
+/** 正解の発表・音声・解説をまとめたカード */
+function answerCard(q) {
+  const ex = q.explain || { en: q.speakOnReveal || q.answer, ja: q.answer };
+  const gloss = glossFor(ex.en, ex.en);
+  const fav = favorites.has(ex.en);
+
+  const notes = [
+    ...(ex.note ? [ex.note] : []),
+    ...(ex.facts || [])
+  ];
+
+  return `
+    <div class="answer-card">
+      <p class="answer-label">正解</p>
+      <p class="answer-en">${esc(ex.en)}</p>
+      <p class="answer-ja">${esc(ex.ja || '')}</p>
+
+      <div class="btn-row answer-tools">
+        <button class="btn" data-say>🔊 聞く</button>
+        <button class="btn" data-say-slow>🐢 ゆっくり</button>
+        <button class="btn${fav ? ' is-on' : ''}" data-fav="${esc(ex.en)}"
+                data-fav-on="★ 復習リストに追加済み" data-fav-off="☆ 復習リストに追加">${fav ? '★ 復習リストに追加済み' : '☆ 復習リストに追加'}</button>
+      </div>
+
+      <div class="answer-explain">
+        <h4>解説</h4>
+        ${notes.map((t) => `<p>${esc(t)}</p>`).join('')}
+        ${ex.scene ? `<p class="answer-scene">使う場面：${esc(ex.scene)}</p>` : ''}
+        ${
+          gloss.length
+            ? `<p class="gloss-title">この文に出てくる語</p>
+               <ul class="gloss">${gloss
+                 .map((g) => `<li><b>${esc(g.en)}</b><span>${esc(g.ja)}</span></li>`)
+                 .join('')}</ul>`
+            : ''
+        }
+        ${ex.href ? `<a class="btn btn-ghost answer-link" href="${esc(ex.href)}">📖 この場面のフレーズ集を見る</a>` : ''}
+      </div>
+    </div>`;
 }
 
 export function mountQuiz(root, mode = 'all', scope = 'all') {
@@ -302,16 +380,21 @@ export function mountQuiz(root, mode = 'all', scope = 'all') {
     host.querySelector('#quiz-feedback').innerHTML = `
       <div class="feedback ${ok ? 'ok' : 'ng'}">
         <strong>${ok ? '正解です' : '惜しい'}</strong>
-        正解：${esc(q.answer)}
+        ${ok ? 'この調子です。声に出して定着させましょう。' : '解説を読んで、声に出してみましょう。'}
       </div>
-      <div class="btn-row" style="margin-top:14px">
-        <button class="btn" data-replay>🔊 もう一度聞く</button>
+
+      ${answerCard(q)}
+
+      <div class="btn-row" style="margin-top:16px">
         <button class="btn btn-primary" data-next>${isLast ? '結果を見る' : '次の問題 →'}</button>
-        <button class="btn" data-fav="${esc(q.speakOnReveal || q.answer)}">☆ 復習リストに追加</button>
       </div>`;
 
     host.querySelector('#quiz-feedback').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    host.querySelector('[data-replay]').addEventListener('click', () => speak(q.speakOnReveal || q.answer));
+    const sayText = q.explain?.en || q.speakOnReveal || q.answer;
+    host.querySelector('[data-say]').addEventListener('click', (e) => speak(sayText, { button: e.currentTarget }));
+    host.querySelector('[data-say-slow]').addEventListener('click', (e) =>
+      speak(sayText, { rate: 0.55, button: e.currentTarget })
+    );
     host.querySelector('[data-next]').addEventListener('click', () => {
       index += 1;
       if (index >= questions.length) drawResult();
