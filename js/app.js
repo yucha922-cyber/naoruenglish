@@ -145,6 +145,12 @@ document.addEventListener('click', (e) => {
     return;
   }
 
+  const slowBtn = e.target.closest('[data-speak-slow]');
+  if (slowBtn) {
+    speak(slowBtn.dataset.speakSlow, { button: slowBtn, rate: 0.55 });
+    return;
+  }
+
   const favBtn = e.target.closest('[data-fav]');
   if (favBtn) {
     const on = favorites.toggle(favBtn.dataset.fav);
