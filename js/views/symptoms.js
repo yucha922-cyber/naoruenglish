@@ -1,5 +1,6 @@
 import { symptoms, symptomCategories } from '../data/symptoms.js';
 import { muscleByName } from '../data/muscles.js';
+import { scenarios } from '../data/scenarios.js';
 import { esc, phraseList, wordList, pageHead, callout, practiceLinks } from '../lib/ui.js';
 
 export function renderIndex(category = 'すべて') {
@@ -86,6 +87,8 @@ export function renderDetail(id) {
       </p>
     </section>
 
-    ${practiceLinks(`symptom-${s.id}`)}
+    ${practiceLinks(`symptom-${s.id}`, {
+      simulation: scenarios.some((x) => x.symptom === `symptom-${s.id}`)
+    })}
   `;
 }

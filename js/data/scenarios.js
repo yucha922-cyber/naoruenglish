@@ -344,7 +344,8 @@ export const scenarios = [
   {
     id: 'low-back-intake',
     section: 'flow-intake',
-    title: '腰痛の問診',
+    symptom: 'symptom-low-back-pain',
+    title: '問診：腰痛',
     level: '中級',
     icon: '🦴',
     description: '痛みの性質と危険なサインを聞き分ける練習です。',
@@ -407,6 +408,300 @@ export const scenarios = [
     ]
   },
 
+  {
+    id: 'stiff-shoulders-intake',
+    section: 'flow-intake',
+    symptom: 'symptom-stiff-shoulders',
+    title: '問診：肩こり',
+    level: '初級',
+    icon: '💢',
+    description: '最も多い主訴です。凝りの範囲・頭痛の有無・デスク環境まで聞き取ります。',
+    patientProfile: 'Rachel / アメリカ出身 / 30代 / IT企業 / 右肩の凝りと頭痛',
+    steps: [
+      {
+        patient: { en: 'My shoulders have been really tight for months. It\'s driving me crazy.', ja: '何ヶ月も肩がガチガチで、本当につらいんです。' },
+        hint: 'まず共感してから、左右どちらかを確認しましょう。',
+        options: [
+          { en: 'I\'m sorry to hear that. Is it both shoulders, or mostly one side?', ja: 'それはおつらいですね。両肩ですか、片側が中心ですか。', correct: true, feedback: '共感 + 範囲の確認。問診の入り口として理想的です。' },
+          { en: 'Everyone in Japan has stiff shoulders.', ja: '日本人はみんな肩が凝っていますよ。', correct: false, feedback: '一般化して流しています。相手のつらさを軽く扱っている印象になります。' },
+          { en: 'Okay, let\'s start the treatment right away.', ja: 'では、すぐ施術を始めましょう。', correct: false, feedback: '何も聞かずに始めています。問診が施術の質を決めます。' }
+        ]
+      },
+      {
+        patient: { en: 'Mostly my right side, up here near my neck.', ja: '主に右側で、この首の近くです。' },
+        hint: '凝りが首や頭にまで広がっているかを確認します。',
+        options: [
+          { en: 'Thank you. Does it go up into your neck, or give you headaches?', ja: 'ありがとうございます。首まで上がってきたり、頭痛が出たりしますか。', correct: true, feedback: '肩こりと頭痛はつながることが多く、必ず確認すべき項目です。' },
+          { en: 'That\'s your upper trapezius. It\'s inflamed.', ja: '僧帽筋上部ですね。炎症を起こしています。', correct: false, feedback: '触ってもいないのに断定しています。診断はできません。' },
+          { en: 'Do you get enough exercise?', ja: '運動はしていますか。', correct: false, feedback: '話が飛んでいます。まず症状の広がりを押さえましょう。' }
+        ]
+      },
+      {
+        patient: { en: 'Yes, actually. I get headaches maybe twice a week.', ja: 'はい、実は週に2回くらい頭痛があります。' },
+        hint: '頭痛の種類を切り分けます。締めつけ型か、脈打つ型かで対応が変わります。',
+        options: [
+          { en: 'Does the headache feel like pressure, or does it throb?', ja: 'その頭痛は締めつけられる感じですか、脈打つ感じですか。', correct: true, feedback: '緊張型と片頭痛を切り分ける質問です。施術の強さの判断に直結します。' },
+          { en: 'That\'s definitely from your shoulders.', ja: 'それは間違いなく肩から来ています。', correct: false, feedback: '断定は避けてください。頭痛には他の原因もあります。' },
+          { en: 'You should take painkillers before it gets worse.', ja: 'ひどくなる前に痛み止めを飲んでください。', correct: false, feedback: '薬の助言は医療行為の領域です。踏み込まないでください。' }
+        ]
+      },
+      {
+        patient: { en: 'More like a tight band around my head.', ja: '頭を締めつけられるような感じです。' },
+        hint: '生活環境を掘り下げるタイミングです。',
+        options: [
+          { en: 'I see. How many hours a day are you at a computer?', ja: 'なるほど。1日何時間くらいパソコンに向かっていますか。', correct: true, feedback: '原因を探る質問に自然に移れています。' },
+          { en: 'Then you have tension headaches.', ja: 'では緊張型頭痛ですね。', correct: false, feedback: '診断名を口にしてはいけません。「そのタイプに近いですね」に留めましょう。' },
+          { en: 'Okay, please lie face down on the bed.', ja: 'では、うつ伏せになってください。', correct: false, feedback: '安全確認がまだです。施術に移るのが早すぎます。' }
+        ]
+      },
+      {
+        patient: { en: 'Probably nine or ten hours. I work from home.', ja: '9〜10時間くらいでしょうか。在宅勤務なので。' },
+        hint: '右側だけ凝る理由の手がかりを探しましょう。',
+        options: [
+          { en: 'Is your mouse hand the same side as the tight shoulder?', ja: 'マウスを持つ手と、凝っている側は同じですか。', correct: true, feedback: '鋭い質問です。片側性の凝りでは原因特定の決め手になります。' },
+          { en: 'Ten hours is too much. You should work less.', ja: '10時間は多すぎます。もっと働く時間を減らすべきです。', correct: false, feedback: '説教に聞こえます。仕事は変えられないことが多いものです。' },
+          { en: 'Nine hours is normal these days.', ja: '最近は9時間くらい普通ですよ。', correct: false, feedback: '流してしまっています。せっかくの情報を活かせていません。' }
+        ]
+      },
+      {
+        patient: { en: 'Yes, my right hand. I never thought about that.', ja: '右手です。考えたこともありませんでした。' },
+        hint: '施術前に神経症状を確認しておきましょう。',
+        options: [
+          { en: 'Good to know. Any numbness or tingling in that arm or hand?', ja: '参考になります。その腕や手にしびれはありますか。', correct: true, feedback: '肩こりでも神経症状の確認は必須です。あれば対応が変わります。' },
+          { en: 'Then the mouse is the cause.', ja: 'ではマウスが原因ですね。', correct: false, feedback: '断定が早すぎます。要因の一つ、という言い方に留めましょう。' },
+          { en: 'Great. Let\'s begin. Please lie face down.', ja: 'では始めましょう。うつ伏せになってください。', correct: false, feedback: 'しびれの確認をしないまま進めています。' }
+        ]
+      },
+      {
+        patient: { en: 'No numbness, just the tightness.', ja: 'しびれはありません。張りだけです。' },
+        hint: '最後に禁忌の確認をして問診を締めます。',
+        options: [
+          { en: 'Thank you. Before we start, are you taking any medication?', ja: 'ありがとうございます。始める前に、お薬は飲んでいますか。', correct: true, feedback: '問診の締めとして完璧です。薬の確認は毎回必ず行ってください。' },
+          { en: 'Great, no problems then. Let\'s go.', ja: 'では問題ありませんね。始めましょう。', correct: false, feedback: '薬・既往歴の確認をしていません。内出血などのリスクが残ります。' },
+          { en: 'You will need at least ten sessions.', ja: '最低10回は必要です。', correct: false, feedback: 'まだ体を見ていません。回数の断定は信頼を損ねます。' }
+        ]
+      }
+    ]
+  },
+
+  {
+    id: 'neck-intake',
+    section: 'flow-intake',
+    symptom: 'symptom-neck-stiffness',
+    title: '問診：首の痛み',
+    level: '中級',
+    icon: '🧣',
+    description: '寝違えの訴え。外傷の除外・可動域・めまいの確認まで、慎重に進めます。',
+    patientProfile: 'Ben / オーストラリア出身 / 40代 / 朝起きたら首が回らない',
+    steps: [
+      {
+        patient: { en: 'I woke up this morning and I can\'t turn my head to the left.', ja: '今朝起きたら、首が左に回らなくなっていました。' },
+        hint: 'まず経過を確認します。急に起きたのかどうかが重要です。',
+        options: [
+          { en: 'That sounds painful. Did it come on suddenly overnight?', ja: 'それはお辛いですね。一晩で急に起きた感じですか。', correct: true, feedback: '共感 + 発症の様子。急性か慢性かで対応が大きく変わります。' },
+          { en: 'You just slept in a bad position.', ja: '寝相が悪かっただけですね。', correct: false, feedback: '確認前の決めつけです。他の原因を見落とします。' },
+          { en: 'Don\'t worry, I can fix that in one session.', ja: 'ご安心を。1回で治せます。', correct: false, feedback: '安請け合いです。守れない約束は信頼を失います。' }
+        ]
+      },
+      {
+        patient: { en: 'Yeah, it was completely fine when I went to bed.', ja: 'はい、寝るときは何ともなかったです。' },
+        hint: '首では外傷の有無を必ず確認します。ここを飛ばしてはいけません。',
+        options: [
+          { en: 'Understood. Have you had any injuries recently, like a car accident?', ja: '承知しました。最近ケガや交通事故などはありましたか。', correct: true, feedback: '首の問診で最重要の確認です。むち打ちを見落とさないために必ず聞きます。' },
+          { en: 'Then it\'s just a stiff neck. Nothing serious.', ja: 'ではただの寝違えですね。心配いりません。', correct: false, feedback: '外傷を除外する前に「心配ない」と言ってはいけません。' },
+          { en: 'What kind of pillow do you use?', ja: 'どんな枕を使っていますか。', correct: false, feedback: '枕も大切ですが、順番が違います。まず安全確認を。' }
+        ]
+      },
+      {
+        patient: { en: 'No accidents at all. I just woke up like this.', ja: '事故などは一切ありません。起きたらこうなっていました。' },
+        hint: '可動域を具体的な形で聞きましょう。',
+        options: [
+          { en: 'Okay. How far can you turn before something stops you?', ja: 'わかりました。どのあたりまで回すと止まってしまいますか。', correct: true, feedback: '「どこまで動くか」を具体的に聞けています。施術前後の比較にも使えます。' },
+          { en: 'Can you move your neck?', ja: '首は動きますか。', correct: false, feedback: '曖昧すぎます。「はい」で終わってしまい情報が得られません。' },
+          { en: 'Let me turn your head and see.', ja: '私が首を回してみますね。', correct: false, feedback: '同意を得ずに他動で動かすのは危険です。まず自分で動かしてもらいます。' }
+        ]
+      },
+      {
+        patient: { en: 'Maybe halfway. It catches and I have to stop.', ja: '半分くらいです。引っかかって止まってしまいます。' },
+        hint: '神経症状の確認に進みます。',
+        options: [
+          { en: 'Do you feel any numbness or tingling going down your arm?', ja: '腕に下りるしびれやピリピリ感はありますか。', correct: true, feedback: '腕への放散は頸椎由来を示唆します。必ず確認してください。' },
+          { en: 'That\'s normal for a stiff neck.', ja: '寝違えなら普通のことです。', correct: false, feedback: '確認を飛ばして安心させています。' },
+          { en: 'Try cracking it yourself and see if it helps.', ja: 'ご自分で鳴らしてみてください。', correct: false, feedback: '自己矯正は危険です。絶対にすすめないでください。' }
+        ]
+      },
+      {
+        patient: { en: 'No, it\'s all in my neck.', ja: 'いいえ、首だけです。' },
+        hint: 'めまいの有無も首では確認しておきます。',
+        options: [
+          { en: 'Good. And do you feel any dizziness when you move your head?', ja: 'よかったです。頭を動かしたときにめまいはありますか。', correct: true, feedback: '首の施術前に必ず確認すべき項目です。あれば強い操作は避けます。' },
+          { en: 'Then we can do anything you like today.', ja: 'では今日は何でもできますね。', correct: false, feedback: '油断です。確認すべき項目がまだ残っています。' },
+          { en: 'Let\'s do a strong adjustment to release it.', ja: '強めの矯正でゆるめましょう。', correct: false, feedback: '急性期に強い操作は禁物です。悪化させます。' }
+        ]
+      },
+      {
+        patient: { en: 'No dizziness. Just the pain when I turn.', ja: 'めまいはありません。回すと痛いだけです。' },
+        hint: '原因になりうる習慣を聞きます。',
+        options: [
+          { en: 'Thank you. What kind of pillow do you use? High or low?', ja: 'ありがとうございます。枕はどんなものをお使いですか。高いですか低いですか。', correct: true, feedback: '安全確認を終えてから習慣へ。順序が正しいです。' },
+          { en: 'You should buy a new pillow today.', ja: '今日新しい枕を買ってください。', correct: false, feedback: 'まだ何も確認していないのに指示しています。' },
+          { en: 'Okay, we\'re done with the questions.', ja: 'では質問は終わりです。', correct: false, feedback: '締め方が唐突です。原因の手がかりを取り逃しています。' }
+        ]
+      },
+      {
+        patient: { en: 'Pretty high, I think. It\'s quite firm too.', ja: 'かなり高いと思います。硬めでもあります。' },
+        hint: '今日の方針を伝えて、安心してもらいましょう。',
+        options: [
+          { en: 'That may be part of it. Today I\'ll work gently and won\'t force the movement.', ja: 'それも一因かもしれません。本日はやさしく行い、無理に動かすことはしません。', correct: true, feedback: '断定を避けつつ方針を明示。急性期の対応として理想的です。' },
+          { en: 'Your pillow is the cause. Change it and you\'ll be fine.', ja: '枕が原因です。変えれば治ります。', correct: false, feedback: '断定しすぎです。原因は複数あることがほとんどです。' },
+          { en: 'I\'ll stretch your neck all the way to the end range.', ja: '首を最後まで伸ばしていきます。', correct: false, feedback: '動かない方向へ無理に伸ばすのは危険です。' }
+        ]
+      }
+    ]
+  },
+
+  {
+    id: 'upper-back-intake',
+    section: 'flow-intake',
+    symptom: 'symptom-upper-back-pain',
+    title: '問診：背中の痛み',
+    level: '中級',
+    icon: '🎒',
+    description: '肩甲骨の間の痛み。呼吸との関係や発疹など、見落としてはいけない点を確認します。',
+    patientProfile: 'Sofia / スペイン出身 / 30代 / 肩甲骨の間が数週間痛む',
+    steps: [
+      {
+        patient: { en: 'I have this constant ache between my shoulder blades.', ja: '肩甲骨の間がずっと痛むんです。' },
+        hint: 'まず場所を正確に特定しましょう。',
+        options: [
+          { en: 'Thank you for telling me. Is it right in the middle, or off to one side?', ja: 'ありがとうございます。ちょうど真ん中ですか、片側に寄っていますか。', correct: true, feedback: '正中か片側かで考えるべきことが変わります。良い出だしです。' },
+          { en: 'That\'s very common with desk work.', ja: 'デスクワークではよくあることです。', correct: false, feedback: '仕事の内容をまだ聞いていません。決めつけになっています。' },
+          { en: 'Let me press on it and see.', ja: '押して確かめてみますね。', correct: false, feedback: '同意なく触れています。問診を先に終えましょう。' }
+        ]
+      },
+      {
+        patient: { en: 'A bit to the left of my spine.', ja: '背骨の少し左側です。' },
+        hint: '背中では呼吸との関係を必ず確認します。肋骨や内臓の問題を見落とさないためです。',
+        options: [
+          { en: 'Does it hurt more when you take a deep breath?', ja: '深く息を吸うと痛みは強くなりますか。', correct: true, feedback: '背部痛では必須の確認です。呼吸で変わる痛みは慎重に扱います。' },
+          { en: 'That\'s a muscle knot in your rhomboid.', ja: '菱形筋のしこりですね。', correct: false, feedback: '触診もせずに断定しています。診断はできません。' },
+          { en: 'Do you sleep on your side?', ja: '横向きで寝ますか。', correct: false, feedback: '優先度が低い質問です。先に確認すべきことがあります。' }
+        ]
+      },
+      {
+        patient: { en: 'Now that you mention it, yes, a little.', ja: '言われてみれば、少し痛みます。' },
+        hint: '前に回り込むかどうかを確認します。',
+        options: [
+          { en: 'I see. Does the pain wrap around to the front of your chest?', ja: 'なるほど。痛みは胸の前まで回り込みますか。', correct: true, feedback: '帯状に回る痛みは注意が必要です。確認できていて素晴らしいです。' },
+          { en: 'Then it\'s coming from your ribs.', ja: 'では肋骨から来ていますね。', correct: false, feedback: '断定は避けてください。まだ情報が足りません。' },
+          { en: 'It\'s nothing serious, don\'t worry.', ja: '大したことはありません、心配いりません。', correct: false, feedback: '根拠のない安心は危険です。確認を続けてください。' }
+        ]
+      },
+      {
+        patient: { en: 'No, it stays in my back.', ja: 'いいえ、背中だけです。' },
+        hint: '発疹などのサインも確認しておきましょう。',
+        options: [
+          { en: 'Good. Have you noticed any rash or blisters in that area?', ja: 'よかったです。その部分に発疹や水疱は出ていませんか。', correct: true, feedback: '帯状疱疹を見逃さないための確認です。ここまで聞けると安心です。' },
+          { en: 'Good, then we can start.', ja: 'では始められますね。', correct: false, feedback: '確認が不足しています。背中には見落としやすいサインがあります。' },
+          { en: 'Let\'s skip the rest of the questions.', ja: '残りの質問は省きましょう。', correct: false, feedback: '問診を省略してはいけません。' }
+        ]
+      },
+      {
+        patient: { en: 'No rash. It actually started after I bought a new backpack.', ja: '発疹はありません。実は新しいリュックを買ってから始まりました。' },
+        hint: 'きっかけが出てきました。丁寧に掘り下げましょう。',
+        options: [
+          { en: 'That\'s very helpful. Do you carry it on both straps, or just one?', ja: 'それは大きな手がかりです。両方の肩紐で背負っていますか、片方だけですか。', correct: true, feedback: '片掛けは左右差の原因になります。的確な深掘りです。' },
+          { en: 'Then stop using the backpack.', ja: 'ではリュックの使用をやめてください。', correct: false, feedback: '原因と決めつけて指示しています。まだ検証していません。' },
+          { en: 'Backpacks are bad for your back in general.', ja: 'リュックは基本的に背中に悪いです。', correct: false, feedback: '一般化しすぎです。使い方の問題であることが多いです。' }
+        ]
+      },
+      {
+        patient: { en: 'Just one, on my right shoulder usually.', ja: '片方だけです。だいたい右肩に掛けています。' },
+        hint: '今日確認したいことを伝えて、問診を締めます。',
+        options: [
+          { en: 'Thank you. Today I\'d like to check how your ribs move when you breathe.', ja: 'ありがとうございます。本日は呼吸のときの肋骨の動きも確認させてください。', correct: true, feedback: '呼吸と背中はつながっています。次の検査へ自然につなげられています。' },
+          { en: 'The backpack is definitely the cause.', ja: 'リュックが原因で間違いありません。', correct: false, feedback: '断定は禁物です。要因の一つとして扱いましょう。' },
+          { en: 'Please lie face down and relax.', ja: 'うつ伏せになってリラックスしてください。', correct: false, feedback: '説明がないまま進めています。何をするか伝えましょう。' }
+        ]
+      }
+    ]
+  },
+
+  {
+    id: 'knee-intake',
+    section: 'flow-intake',
+    symptom: 'symptom-knee-pain',
+    title: '問診：膝の痛み',
+    level: '上級',
+    icon: '🦿',
+    description: 'ランナーの膝の痛み。危険なサインを除外し、膝以外も診る理由を説明します。',
+    patientProfile: 'Chris / カナダ出身 / 40代 / 週3回ランニング / 右膝が痛む',
+    steps: [
+      {
+        patient: { en: 'My right knee has been hurting when I run.', ja: '走ると右膝が痛むんです。' },
+        hint: '膝では場所の特定が最優先です。',
+        options: [
+          { en: 'Could you point to exactly where it hurts?', ja: '痛むところを正確に指さしていただけますか。', correct: true, feedback: '膝は数センチの違いで考えることが変わります。指さしが最も確実です。' },
+          { en: 'Runners always have knee problems.', ja: 'ランナーはみんな膝を痛めますよ。', correct: false, feedback: '一般化して片づけています。相手の不安は消えません。' },
+          { en: 'You should stop running for now.', ja: '当面ランニングはやめてください。', correct: false, feedback: '何も確認せずに制限をかけています。早すぎます。' }
+        ]
+      },
+      {
+        patient: { en: 'Right here, just under the kneecap.', ja: 'ここです。膝のお皿のすぐ下あたり。' },
+        hint: '受傷時の音は靭帯損傷の重要なサインです。',
+        options: [
+          { en: 'Thank you. Did you hear or feel a pop when it started?', ja: 'ありがとうございます。始まったとき、ポンという音や感覚はありましたか。', correct: true, feedback: '靭帯損傷を除外する重要な質問です。「はい」なら受診案内です。' },
+          { en: 'That\'s runner\'s knee.', ja: 'それはランナー膝ですね。', correct: false, feedback: '診断名を口にしています。整体師は診断できません。' },
+          { en: 'How many kilometers do you run each week?', ja: '週に何キロ走りますか。', correct: false, feedback: '有用ですが順番が違います。まず危険なサインの除外を。' }
+        ]
+      },
+      {
+        patient: { en: 'No pop. It came on gradually over a few weeks.', ja: '音はしていません。数週間かけて少しずつです。' },
+        hint: '腫れと引っかかりを確認します。',
+        options: [
+          { en: 'Is it swollen at all, or does the knee ever lock or catch?', ja: '腫れはありますか。膝がロックしたり引っかかったりしますか。', correct: true, feedback: 'ロックは半月板を示唆します。腫れとあわせて必ず確認してください。' },
+          { en: 'Gradual is good. Nothing to worry about then.', ja: '徐々にならよかったです。心配いりませんね。', correct: false, feedback: '油断です。徐々でも重い問題のことがあります。' },
+          { en: 'Let me bend it all the way and see.', ja: '思い切り曲げて確かめてみましょう。', correct: false, feedback: '確認前に他動で強く動かすのは危険です。' }
+        ]
+      },
+      {
+        patient: { en: 'No swelling, and it doesn\'t lock.', ja: '腫れはなく、ロックもしません。' },
+        hint: '階段での症状は、痛みの出どころの手がかりになります。',
+        options: [
+          { en: 'Good. Is it worse going up the stairs, or coming down?', ja: 'よかったです。階段は上りと下り、どちらがつらいですか。', correct: true, feedback: '下りでの痛みは膝蓋大腿関節への負担を示唆します。良い質問です。' },
+          { en: 'Then it\'s just tight muscles.', ja: 'では単なる筋肉の張りですね。', correct: false, feedback: '断定が早いです。まだ確認すべきことがあります。' },
+          { en: 'Do you stretch before running?', ja: '走る前にストレッチはしますか。', correct: false, feedback: '悪くありませんが、症状の特定を先に終えましょう。' }
+        ]
+      },
+      {
+        patient: { en: 'Definitely coming down. Going up is fine.', ja: '断然、下りです。上りは平気です。' },
+        hint: '膝だけを見ないことを伝えます。',
+        options: [
+          { en: 'Understood. Today I\'d also like to check your hip and ankle.', ja: '承知しました。本日は股関節と足首も確認させてください。', correct: true, feedback: '膝の痛みは上下の関節が原因のことが多いです。的確な判断です。' },
+          { en: 'We\'ll focus only on the knee today.', ja: '本日は膝だけに集中します。', correct: false, feedback: '原因を見落とします。膝は結果であることが多いです。' },
+          { en: 'Your knee cartilage is probably damaged.', ja: 'おそらく膝の軟骨が傷んでいます。', correct: false, feedback: '不安を煽る断定です。画像も見ずに言えることではありません。' }
+        ]
+      },
+      {
+        patient: { en: 'Why the hip? The pain is in my knee.', ja: 'なぜ股関節を。痛いのは膝ですよ。' },
+        hint: '理由をやさしい言葉で説明しましょう。',
+        options: [
+          { en: 'The knee sits between them. If the hip is weak, the knee takes the load.', ja: '膝はその間にあります。股関節が弱いと、その負担を膝が引き受けます。', correct: true, feedback: '専門用語を使わず、位置関係で説明できています。とても伝わります。' },
+          { en: 'Please just trust me on this.', ja: 'そこは信じてください。', correct: false, feedback: '説明を放棄しています。納得のないまま進むと不信が残ります。' },
+          { en: 'It\'s too complicated to explain.', ja: '説明が難しいので省きます。', correct: false, feedback: '簡単な言葉で説明できます。省いてはいけません。' }
+        ]
+      },
+      {
+        patient: { en: 'That makes sense. Anything else you need to know?', ja: '納得しました。他に必要なことはありますか。' },
+        hint: '靴と安全確認で締めます。',
+        options: [
+          { en: 'How old are your running shoes? And are you taking any medication?', ja: 'ランニングシューズはどのくらい使っていますか。あと、お薬は飲んでいますか。', correct: true, feedback: '靴の摩耗は膝に直結します。薬の確認も忘れていません。' },
+          { en: 'No, that\'s everything. Let\'s start.', ja: 'いいえ、以上です。始めましょう。', correct: false, feedback: '安全確認をしていません。毎回必ず行ってください。' },
+          { en: 'Go buy new shoes today.', ja: '今日新しい靴を買ってください。', correct: false, feedback: '摩耗を確認する前の指示です。順序が逆です。' }
+        ]
+      }
+    ]
+  },
   {
     id: 'assessment-explain',
     section: 'flow-assessment',

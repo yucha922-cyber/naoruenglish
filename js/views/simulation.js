@@ -28,7 +28,7 @@ export function renderIndex(scope = 'all') {
 
   // 特定の範囲が選ばれていれば、そのシナリオだけを出す
   if (scope !== 'all') {
-    const hit = scenarios.filter((s) => s.section === scope);
+    const hit = scenarios.filter((s) => s.section === scope || s.symptom === scope);
     return `
       ${pageHead('💬 会話シミュレーション', '患者様の発言に対して、最適な返答を選んでいきます。', '#/learn')}
       ${scopePicker(scope)}
@@ -58,7 +58,7 @@ export function renderIndex(scope = 'all') {
 
 /** 範囲を選ぶプルダウン（シミュレーションがある範囲だけ出す） */
 function scopePicker(scope) {
-  const withScenario = new Set(scenarios.map((s) => s.section));
+  const withScenario = new Set(scenarios.flatMap((s) => [s.section, s.symptom]).filter(Boolean));
   const groups = scopeOptions()
     .map((g) => {
       const items = g.items.filter((o) => o.id === 'all' || withScenario.has(o.id));
