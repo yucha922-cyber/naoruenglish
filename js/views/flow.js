@@ -49,6 +49,7 @@ export function renderDetail(id) {
         (g) => `
       <section>
         <h2 class="section-title">${esc(g.title)}</h2>
+        ${g.note ? `<p class="muted" style="margin:-4px 0 10px">${esc(g.note)}</p>` : ''}
         ${phraseList(g.phrases)}
       </section>`
       )
@@ -56,8 +57,14 @@ export function renderDetail(id) {
 
     <section>
       <h2 class="section-title">患者様が言いそうなこと</h2>
-      <p class="muted" style="margin:-4px 0 10px">聞き取れるようにしておくと、会話が一気に楽になります。</p>
-      ${phraseList(phase.patientPhrases, { patient: true })}
+      <p class="muted" style="margin:-4px 0 10px">同じ内容でも、人によって言い方はさまざまです。聞き取れるようにしておくと、会話が一気に楽になります。</p>
+      ${(phase.patientGroups || [])
+        .map(
+          (g) => `
+        <h3 class="sub-title">${esc(g.title)}</h3>
+        ${phraseList(g.phrases, { patient: true })}`
+        )
+        .join('')}
     </section>
 
     ${practiceLinks(`flow-${phase.id}`, {

@@ -3,6 +3,7 @@ import { favorites, progress, settings } from './lib/storage.js';
 import { speak, stopSpeaking, canSpeak, canListen, englishVoices, loadVoices, isRecommended } from './lib/speech.js';
 import { isValidScope } from './data/scopes.js';
 import { esc } from './lib/ui.js';
+import { authEnabled, loginRequired, authState, initAuth, onAuthChange, signIn, signOut, isAdmin, isInAppBrowser } from './lib/auth.js';
 
 import * as home from './views/home.js';
 import * as flow from './views/flow.js';
@@ -12,18 +13,82 @@ import * as learn from './views/learn.js';
 import * as simulation from './views/simulation.js';
 import * as phone from './views/phone.js';
 import * as searchView from './views/search.js';
+import * as meeting from './views/meeting.js';
+import * as admin from './views/admin.js';
 
 const app = document.getElementById('app');
 const searchInput = document.getElementById('search-input');
 
 /* ---------------- 描画 ---------------- */
 
+let cleanup = null;
+
 function show(html, mount) {
   stopSpeaking();
+  // 前の画面の後片付け（管理画面のリアルタイム購読など）
+  cleanup?.();
+  cleanup = null;
+
+  if (loginRequired && !authState.user) {
+    app.innerHTML = authState.ready ? loginPage() : '<p class="empty">読み込み中…</p>';
+    window.scrollTo(0, 0);
+    return;
+  }
+
   app.innerHTML = html;
   window.scrollTo(0, 0);
-  mount?.(app);
+  const result = mount?.(app);
+  if (typeof result === 'function') cleanup = result;
 }
+
+/* ---------------- ログイン ---------------- */
+
+function loginPage() {
+  return `
+    <div class="login-box">
+      <div class="login-icon">🩺</div>
+      <h1>セラピストの英会話</h1>
+      <p>このサイトは、Google アカウントでログインしてご利用いただけます。</p>
+      ${
+        isInAppBrowser()
+          ? `<div class="callout warn"><h3>⚠️ アプリ内ブラウザでは開けません</h3>
+              <p style="margin:0">LINE などのアプリ内では Google ログインができません。右上のメニューから「Safari で開く」「ブラウザで開く」を選んでください。</p></div>`
+          : ''
+      }
+      ${authState.error ? `<p class="login-error">${esc(authState.error)}</p>` : ''}
+      <button class="btn btn-primary btn-lg btn-block" data-login>Google でログイン</button>
+      <p class="login-note">
+        ログインすると、お気に入りがアカウントに保存され、スマホとパソコンなど別の端末でも同じお気に入りを使えます。<br>
+        ご利用の確認のため、ログインに使った Gmail アドレスと利用日時が運営者に記録されます。
+      </p>
+    </div>`;
+}
+
+const accountField = document.getElementById('account-field');
+const accountBox = document.getElementById('account-box');
+
+function renderAccount() {
+  if (!authEnabled) return;
+  accountField.hidden = false;
+  const u = authState.user;
+  accountBox.innerHTML = u
+    ? `<p class="account-line">ログイン中：<b>${esc(u.email)}</b></p>
+       <p class="field-help" style="margin:0 0 8px">お気に入りはこのアカウントに保存されています。</p>
+       <div class="btn-row">
+         ${isAdmin() ? '<a class="btn" href="#/admin" data-close>🔒 管理画面</a>' : ''}
+         <button class="btn btn-ghost" data-logout>ログアウト</button>
+       </div>`
+    : `<p class="field-help" style="margin:0 0 8px">ログインすると、お気に入りを別の端末でも使えます。</p>
+       <button class="btn btn-primary" data-login>Google でログイン</button>`;
+}
+
+onAuthChange(() => {
+  renderAccount();
+  resolve();
+  syncTabs();
+});
+
+window.addEventListener('naoru:favorites-synced', refreshFavButtons);
 
 function notFoundPage() {
   show(`
@@ -91,6 +156,19 @@ route(/^\/search$/, (_, q) => {
 
 route(/^\/favorites$/, () => show(searchView.renderFavorites()));
 
+route(/^\/meeting$/, () => show(meeting.renderIndex()));
+route(/^\/meeting\/script$/, () => show(meeting.renderScript()));
+route(/^\/meeting\/([\w-]+)$/, ([id]) => {
+  const html = meeting.renderDetail(id);
+  html ? show(html) : notFoundPage();
+});
+
+// 管理画面：管理者以外には「ページが見つかりません」と表示し、存在を知らせない
+route(/^\/admin$/, () => {
+  if (!isAdmin()) return notFoundPage();
+  show(admin.render(), (root) => admin.mount(root));
+});
+
 setNotFound(notFoundPage);
 
 /* ---------------- タブの選択状態 ---------------- */
@@ -99,7 +177,7 @@ const TAB_MATCH = [
   ['flow', /^\/(flow|phone)/],
   ['symptoms', /^\/symptoms/],
   ['words', /^\/(words|muscles)/],
-  ['learn', /^\/learn/],
+  ['learn', /^\/(learn|meeting)/],
   ['home', /^\/$/]
 ];
 
@@ -153,15 +231,22 @@ document.addEventListener('click', (e) => {
 
   const favBtn = e.target.closest('[data-fav]');
   if (favBtn) {
-    const on = favorites.toggle(favBtn.dataset.fav);
+    favorites.toggle(favBtn.dataset.fav);
     // 同じフレーズのボタンをまとめて更新する
-    document.querySelectorAll(`[data-fav="${CSS.escape(favBtn.dataset.fav)}"]`).forEach((b) => {
-      b.classList.toggle('is-on', on);
-      if (b.classList.contains('tool-btn')) b.textContent = on ? '★' : '☆';
-      // 文字ラベル付きのボタン（クイズの解説など）
-      else if (b.dataset.favOn) b.textContent = on ? b.dataset.favOn : b.dataset.favOff;
-    });
+    refreshFavButtons(favBtn.dataset.fav);
     if (currentPath() === '/favorites') resolve();
+    return;
+  }
+
+  if (e.target.closest('[data-login]')) {
+    signIn();
+    return;
+  }
+
+  if (e.target.closest('[data-logout]')) {
+    if (!confirm('ログアウトしますか。')) return;
+    closeModal(settingsModal);
+    signOut();
     return;
   }
 
@@ -177,6 +262,18 @@ document.addEventListener('click', (e) => {
     closeModal(e.target.closest('.modal'));
   }
 });
+
+/** ☆ / ★ の表示をお気に入りの状態に合わせる。en を渡すとそのフレーズだけ更新する */
+function refreshFavButtons(en) {
+  const sel = typeof en === 'string' ? `[data-fav="${CSS.escape(en)}"]` : '[data-fav]';
+  document.querySelectorAll(sel).forEach((b) => {
+    const on = favorites.has(b.dataset.fav);
+    b.classList.toggle('is-on', on);
+    if (b.classList.contains('tool-btn')) b.textContent = on ? '★' : '☆';
+    // 文字ラベル付きのボタン（クイズの解説など）
+    else if (b.dataset.favOn) b.textContent = on ? b.dataset.favOn : b.dataset.favOff;
+  });
+}
 
 document.getElementById('present-speak').addEventListener('click', (e) => {
   speak(presentEn.textContent, { button: e.currentTarget });
@@ -268,6 +365,7 @@ function fillSupport() {
 }
 
 document.getElementById('settings-btn').addEventListener('click', () => {
+  renderAccount();
   fillVoices();
   fillSupport();
   openModal(settingsModal);
@@ -284,3 +382,5 @@ document.getElementById('reset-progress').addEventListener('click', () => {
 
 start();
 syncTabs();
+renderAccount();
+initAuth();

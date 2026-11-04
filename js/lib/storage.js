@@ -1,5 +1,7 @@
 // localStorage のラッパー。お気に入り・学習記録・設定を保存する。
 
+import { renamed } from '../data/renamed.js';
+
 const PREFIX = 'naoruenglish:';
 
 function read(key, fallback) {
@@ -21,7 +23,34 @@ function write(key, value) {
 
 /* ---------- お気に入り ---------- */
 
-let favSet = new Set(read('favorites', []));
+// お気に入りは英文そのものをキーに保存している。
+// フレーズの英文を言い換えたときは renamed.js に「旧 → 新」を登録しておけば、
+// 端末内・クラウドどちらの保存分も自動で新しい英文に付け替わり、お気に入りが消えない。
+export function migrateFavorites(list) {
+  const out = new Set();
+  for (const en of list || []) {
+    if (typeof en !== 'string' || !en) continue;
+    let cur = en;
+    // 何度か言い換えた場合に備えて、たどれるところまでたどる（循環は打ち切る）
+    for (let i = 0; i < 5 && renamed[cur]; i++) cur = renamed[cur];
+    out.add(cur);
+  }
+  return [...out];
+}
+
+let favSet = new Set(migrateFavorites(read('favorites', [])));
+write('favorites', [...favSet]);
+
+const favListeners = new Set();
+function emitFav() {
+  favListeners.forEach((fn) => {
+    try {
+      fn([...favSet]);
+    } catch {
+      /* noop */
+    }
+  });
+}
 
 export const favorites = {
   has: (en) => favSet.has(en),
@@ -29,17 +58,32 @@ export const favorites = {
     if (favSet.has(en)) favSet.delete(en);
     else favSet.add(en);
     write('favorites', [...favSet]);
+    emitFav();
     return favSet.has(en);
   },
   list: () => [...favSet],
   get size() {
     return favSet.size;
   },
+  /** クラウド同期などで丸ごと置き換える。変更通知は出さない（同期のループを防ぐ） */
+  replaceAll(list) {
+    favSet = new Set(migrateFavorites(list));
+    write('favorites', [...favSet]);
+  },
+  /** お気に入りが変わったときに呼ばれる関数を登録する */
+  onChange(fn) {
+    favListeners.add(fn);
+    return () => favListeners.delete(fn);
+  },
   clear() {
     favSet = new Set();
     write('favorites', []);
+    emitFav();
   }
 };
+
+/** 任意のキーの読み書き（ログイン同期の記録などに使う） */
+export const local = { read, write };
 
 /* ---------- 学習記録 ---------- */
 

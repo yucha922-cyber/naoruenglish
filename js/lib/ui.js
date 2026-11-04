@@ -13,7 +13,7 @@ export function esc(s) {
 
 /**
  * フレーズ1件分のカード。
- * @param {{en: string, ja: string, note?: string}} p
+ * @param {{en: string, ja: string, note?: string, alts?: string[]}} p
  * @param {{patient?: boolean, meta?: string}} opts
  */
 export function phraseCard(p, opts = {}) {
@@ -24,12 +24,31 @@ export function phraseCard(p, opts = {}) {
       <p class="phrase-ja">${esc(p.ja)}</p>
       ${p.note ? `<p class="phrase-note">${esc(p.note)}</p>` : ''}
       ${opts.meta ? `<p class="phrase-meta">${esc(opts.meta)}</p>` : ''}
+      ${altsBlock(p.alts)}
       <div class="phrase-tools">
         <button class="tool-btn" data-speak="${esc(p.en)}" aria-label="読み上げる" title="読み上げる">🔊</button>
         <button class="tool-btn" data-present-en="${esc(p.en)}" data-present-ja="${esc(p.ja)}" aria-label="拡大して見せる" title="拡大して見せる">🔎</button>
         <button class="tool-btn${fav ? ' is-on' : ''}" data-fav="${esc(p.en)}" aria-label="お気に入り" title="お気に入り">${fav ? '★' : '☆'}</button>
       </div>
     </div>`;
+}
+
+/** 同じ意味の、もっと気軽な言い方 */
+function altsBlock(alts) {
+  if (!alts?.length) return '';
+  return `
+      <div class="phrase-alts">
+        <span class="phrase-alts-label">💬 こんな言い方もOK（もっと気軽に）</span>
+        ${alts
+          .map(
+            (a) => `
+        <div class="phrase-alt">
+          <span class="phrase-alt-en">${esc(a)}</span>
+          <button class="tool-btn sm" data-speak="${esc(a)}" aria-label="読み上げる" title="読み上げる">🔊</button>
+        </div>`
+          )
+          .join('')}
+      </div>`;
 }
 
 export function phraseList(items, opts = {}) {
