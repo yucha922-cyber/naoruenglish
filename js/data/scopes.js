@@ -7,6 +7,7 @@ import { meetingTopics, allMeetingPhrases } from './meeting.js';
 import { symptoms, allSymptomPhrases } from './symptoms.js';
 import { muscles, musclesForSymptom } from './muscles.js';
 import { allWords } from './vocabulary.js';
+import { isAdmin } from '../lib/auth.js';
 
 /** 画面のプルダウンに出す選択肢。group ごとにまとめて表示する。 */
 export function scopeOptions() {
@@ -21,13 +22,13 @@ export function scopeOptions() {
       items: phases.map((p) => ({ id: `flow-${p.id}`, label: `${p.step}. ${p.title}` }))
     },
     {
-      group: 'オンライン英会話',
-      items: meetingTopics.map((t) => ({ id: `meeting-${t.id}`, label: t.title }))
-    },
-    {
       group: '症状別',
       items: symptoms.map((s) => ({ id: `symptom-${s.id}`, label: s.name }))
-    }
+    },
+    // オンライン英会話は管理者専用
+    ...(isAdmin()
+      ? [{ group: 'オンライン英会話（管理者のみ）', items: meetingTopics.map((t) => ({ id: `meeting-${t.id}`, label: t.title })) }]
+      : [])
   ];
 }
 
@@ -45,7 +46,7 @@ export function isValidScope(id) {
 export function scopeContent(id) {
   if (!id || id === 'all') {
     return {
-      phrases: [...allPhonePhrases(), ...allPhrases(), ...allSymptomPhrases(), ...allMeetingPhrases()],
+      phrases: [...allPhonePhrases(), ...allPhrases(), ...allSymptomPhrases(), ...(isAdmin() ? allMeetingPhrases() : [])],
       muscles,
       words: allWords()
     };
@@ -57,6 +58,7 @@ export function scopeContent(id) {
   }
 
   if (id.startsWith('meeting-')) {
+    if (!isAdmin()) return { phrases: [], muscles: [], words: [] };
     const topicId = id.slice('meeting-'.length);
     return { phrases: allMeetingPhrases().filter((p) => p.topicId === topicId), muscles: [], words: [] };
   }

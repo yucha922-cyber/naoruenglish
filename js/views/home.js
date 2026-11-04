@@ -6,6 +6,7 @@ import { muscles } from '../data/muscles.js';
 import { allWords } from '../data/vocabulary.js';
 import { favorites, progress } from '../lib/storage.js';
 import { esc } from '../lib/ui.js';
+import { isAdmin } from '../lib/auth.js';
 
 export function render() {
   const quiz = progress.quizStats();
@@ -80,14 +81,18 @@ export function render() {
           </span>
           <span class="nav-arrow">›</span>
         </a>
-        <a class="nav-card" href="#/meeting">
+        ${
+          isAdmin()
+            ? `<a class="nav-card" href="#/meeting">
           <span class="nav-icon">💻</span>
           <span class="nav-body">
-            <strong>オンライン英会話</strong>
+            <strong>オンライン英会話 <span class="tag">管理者のみ</span></strong>
             <span>練習会の入室〜退出まで${meetingTopics.length}場面＋通しの台本</span>
           </span>
           <span class="nav-arrow">›</span>
-        </a>
+        </a>`
+            : ''
+        }
         <a class="nav-card" href="#/learn">
           <span class="nav-icon">🎓</span>
           <span class="nav-body">

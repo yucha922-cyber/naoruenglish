@@ -2,6 +2,7 @@ import { allPhrases } from '../data/phrases.js';
 import { allSymptomPhrases } from '../data/symptoms.js';
 import { allPhonePhrases } from '../data/phone.js';
 import { allMeetingPhrases } from '../data/meeting.js';
+import { isAdmin } from '../lib/auth.js';
 import { allWords } from '../data/vocabulary.js';
 import { muscles } from '../data/muscles.js';
 import { scenarios } from '../data/scenarios.js';
@@ -47,14 +48,18 @@ export function renderHub() {
         </span>
         <span class="nav-arrow">›</span>
       </a>
-      <a class="nav-card" href="#/meeting">
+      ${
+        isAdmin()
+          ? `<a class="nav-card" href="#/meeting">
         <span class="nav-icon">💻</span>
         <span class="nav-body">
-          <strong>オンライン英会話の練習会</strong>
+          <strong>オンライン英会話の練習会 <span class="tag">管理者のみ</span></strong>
           <span>入室から退出までの会話テンプレートと通しの台本</span>
         </span>
         <span class="nav-arrow">›</span>
-      </a>
+      </a>`
+          : ''
+      }
     </div>
 
     <section>
@@ -499,7 +504,7 @@ export function mountQuiz(root, mode = 'all', scope = 'all') {
 function pronPool(source, scope) {
   if (source === 'favorites') {
     const saved = new Set(favorites.list());
-    const all = [...allPhrases(), ...allSymptomPhrases(), ...allPhonePhrases(), ...allMeetingPhrases(), ...allWords(), ...muscles];
+    const all = [...allPhrases(), ...allSymptomPhrases(), ...allPhonePhrases(), ...(isAdmin() ? allMeetingPhrases() : []), ...allWords(), ...muscles];
     const seen = new Set();
     return all.filter((x) => saved.has(x.en) && !seen.has(x.en) && seen.add(x.en)).map((x) => ({ en: x.en, ja: x.ja }));
   }

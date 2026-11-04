@@ -5,6 +5,7 @@ import { allMeetingPhrases, meetingScript } from '../data/meeting.js';
 import { allWords } from '../data/vocabulary.js';
 import { muscles, muscleTalk } from '../data/muscles.js';
 import { favorites } from '../lib/storage.js';
+import { isAdmin } from '../lib/auth.js';
 import { esc, phraseList, pageHead } from '../lib/ui.js';
 
 /** 検索対象をひとつの配列にまとめる */
@@ -20,11 +21,14 @@ function corpus() {
   for (const p of allPhonePhrases()) {
     items.push({ en: p.en, ja: p.ja, note: p.note, meta: `お電話対応 ／ ${p.source} ／ ${p.group}`, patient: p.kind === 'caller' });
   }
-  for (const p of allMeetingPhrases()) {
-    items.push({ en: p.en, ja: p.ja, note: p.note, alts: p.alts, meta: `オンライン英会話 ／ ${p.source} ／ ${p.group}`, patient: p.kind === 'partner' });
-  }
-  for (const l of meetingScript) {
-    items.push({ en: l.en, ja: l.ja, meta: `オンライン英会話 ／ 通しの台本 ／ ${l.step}`, patient: l.who === 'B' });
+  // オンライン英会話は管理者専用なので、管理者以外の検索・お気に入りには出さない
+  if (isAdmin()) {
+    for (const p of allMeetingPhrases()) {
+      items.push({ en: p.en, ja: p.ja, note: p.note, alts: p.alts, meta: `オンライン英会話 ／ ${p.source} ／ ${p.group}`, patient: p.kind === 'partner' });
+    }
+    for (const l of meetingScript) {
+      items.push({ en: l.en, ja: l.ja, meta: `オンライン英会話 ／ 通しの台本 ／ ${l.step}`, patient: l.who === 'B' });
+    }
   }
   for (const w of allWords()) {
     items.push({ en: w.en, ja: w.ja, note: w.note, meta: `単語集 ／ ${w.source}` });
@@ -44,9 +48,15 @@ function corpus() {
   return items;
 }
 
+// ログイン状態で中身が変わるため、管理者かどうかごとに作り直す
 let cached = null;
+let cachedForAdmin = null;
 function getCorpus() {
-  if (!cached) cached = corpus();
+  const admin = isAdmin();
+  if (!cached || cachedForAdmin !== admin) {
+    cached = corpus();
+    cachedForAdmin = admin;
+  }
   return cached;
 }
 

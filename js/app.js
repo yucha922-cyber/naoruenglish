@@ -156,10 +156,11 @@ route(/^\/search$/, (_, q) => {
 
 route(/^\/favorites$/, () => show(searchView.renderFavorites()));
 
-route(/^\/meeting$/, () => show(meeting.renderIndex()));
-route(/^\/meeting\/script$/, () => show(meeting.renderScript()));
+// オンライン英会話：管理者専用。管理者以外には「ページが見つかりません」と表示する
+route(/^\/meeting$/, () => (isAdmin() ? show(meeting.renderIndex()) : notFoundPage()));
+route(/^\/meeting\/script$/, () => (isAdmin() ? show(meeting.renderScript()) : notFoundPage()));
 route(/^\/meeting\/([\w-]+)$/, ([id]) => {
-  const html = meeting.renderDetail(id);
+  const html = isAdmin() ? meeting.renderDetail(id) : null;
   html ? show(html) : notFoundPage();
 });
 
