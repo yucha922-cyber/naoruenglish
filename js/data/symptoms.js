@@ -18,7 +18,11 @@ export const symptoms = [
       { en: 'I have a lot of tension in my shoulders.', ja: '肩がとても張っています。' },
       { en: 'My shoulders feel heavy.', ja: '肩が重いです。' },
       { en: 'It feels like I\'m carrying a weight on my shoulders.', ja: '肩に重りを乗せているような感じです。' },
-      { en: 'I get knots right here.', ja: 'ここにしこりができます。' }
+      { en: 'I get knots right here.', ja: 'ここにしこりができます。' },
+      { en: 'My shoulders are rock hard.', ja: '肩がガチガチです。' },
+      { en: 'My neck and shoulders are so tight.', ja: '首と肩がすごく張っています。' },
+      { en: 'I can\'t get rid of this tension.', ja: 'この張りがどうしても取れません。' },
+      { en: 'It gets really bad after work.', ja: '仕事のあとがすごくつらいです。' }
     ],
     questions: [
       { en: 'Is it stiff on both sides, or mostly one side?', ja: '両肩ですか、片側が中心ですか。' },
@@ -64,7 +68,11 @@ export const symptoms = [
       { en: 'My lower back is killing me.', ja: '腰がものすごく痛いです。' },
       { en: 'I threw my back out.', ja: 'ぎっくり腰になりました。' },
       { en: 'It hurts when I stand up from a chair.', ja: '椅子から立つときに痛みます。' },
-      { en: 'The pain goes down my leg.', ja: '痛みが脚に下りてきます。' }
+      { en: 'The pain goes down my leg.', ja: '痛みが脚に下りてきます。' },
+      { en: 'My back is really sore.', ja: '腰がすごく痛いです。' },
+      { en: 'I can\'t stand up straight.', ja: 'まっすぐ立てません。' },
+      { en: 'It hurts when I bend over.', ja: 'かがむと痛いです。' },
+      { en: 'It\'s hard to get out of bed in the morning.', ja: '朝、ベッドから起き上がるのがつらいです。' }
     ],
     questions: [
       { en: 'Does the pain stay in your back, or go down your leg?', ja: '痛みは腰だけですか、脚まで下りますか。' },
@@ -79,7 +87,7 @@ export const symptoms = [
       { en: 'The muscles along your spine are very tight.', ja: '背骨に沿った筋肉がとても硬くなっています。' },
       { en: 'Your hip flexors are short from sitting all day.', ja: '一日中座っているため、股関節の前の筋肉が縮んでいます。' },
       { en: 'Tight hip flexors pull your pelvis forward and stress your lower back.', ja: '股関節前面が硬いと骨盤が前に引かれ、腰に負担がかかります。' },
-      { en: 'Your deep core muscles are not supporting your spine well.', ja: '深部の体幹筋が背骨をうまく支えられていません。' },
+      { en: 'Your deep core muscles aren\'t supporting your spine well.', ja: '深部の体幹筋が背骨をうまく支えられていません。' },
       { en: 'The muscle on the side of your waist is tighter on the right.', ja: '腰の横の筋肉が右側で硬くなっています。' },
       { en: 'Your glutes are weak, so your lower back does their job.', ja: 'お尻の筋肉が弱く、腰がその役割を代わりに担っています。' }
     ],
@@ -113,7 +121,11 @@ export const symptoms = [
       { en: 'I can\'t turn my head to the left.', ja: '首を左に回せません。' },
       { en: 'I slept wrong last night.', ja: '昨夜、寝違えました。' },
       { en: 'My neck feels tight all the time.', ja: '首がずっと張っています。' },
-      { en: 'It hurts at the base of my skull.', ja: '後頭部の付け根が痛みます。' }
+      { en: 'It hurts at the base of my skull.', ja: '後頭部の付け根が痛みます。' },
+      { en: 'I slept wrong and can\'t turn my head.', ja: '寝違えて首が回りません。' },
+      { en: 'I have a crick in my neck.', ja: '首を寝違えました。' },
+      { en: 'My neck feels stuck.', ja: '首が固まっている感じです。' },
+      { en: 'It hurts to look over my shoulder.', ja: '振り返ると痛みます。' }
     ],
     questions: [
       { en: 'Can you turn your head all the way to both sides?', ja: '首は左右とも最後まで回せますか。' },
@@ -133,9 +145,9 @@ export const symptoms = [
     muscles: ['Sternocleidomastoid', 'Levator scapulae', 'Suboccipital muscles', 'Scalene muscles', 'Splenius capitis', 'Trapezius (upper)'],
     advice: [
       { en: 'Your pillow should keep your neck in line with your spine.', ja: '枕は首と背骨が一直線になる高さにしてください。' },
-      { en: 'A pillow that is too high is a common cause.', ja: '枕が高すぎるのはよくある原因です。' },
+      { en: 'A pillow that\'s too high is a common cause.', ja: '枕が高すぎるのはよくある原因です。' },
       { en: 'Gently tuck your chin in, hold for five seconds. Repeat ten times.', ja: 'あごを軽く引いて5秒キープ。10回繰り返してください。' },
-      { en: 'Do not crack your own neck.', ja: '自分で首を鳴らさないでください。' },
+      { en: 'Don\'t crack your own neck.', ja: '自分で首を鳴らさないでください。' },
       { en: 'Keep your neck warm, especially with air conditioning.', ja: '特にエアコンの下では首を冷やさないでください。' }
     ],
     redFlags: [
@@ -157,7 +169,10 @@ export const symptoms = [
       { en: 'I have really bad posture.', ja: '姿勢がとても悪いです。' },
       { en: 'I slouch a lot.', ja: 'よく猫背になります。' },
       { en: 'People tell me I hunch over.', ja: '背中が丸いとよく言われます。' },
-      { en: 'I can\'t sit up straight for long.', ja: '長くまっすぐ座っていられません。' }
+      { en: 'I can\'t sit up straight for long.', ja: '長くまっすぐ座っていられません。' },
+      { en: 'People say I slouch a lot.', ja: 'よく猫背だと言われます。' },
+      { en: 'I always end up hunched over my desk.', ja: '気づくとデスクで背中が丸まっています。' },
+      { en: 'I want to improve my posture.', ja: '姿勢を良くしたいです。' }
     ],
     questions: [
       { en: 'When did you first notice your posture changing?', ja: 'いつ頃から姿勢が気になり始めましたか。' },
@@ -200,7 +215,9 @@ export const symptoms = [
     patientSays: [
       { en: 'My shoulders roll forward.', ja: '肩が前に入っています。' },
       { en: 'My shoulders look narrow in photos.', ja: '写真で肩幅が狭く見えます。' },
-      { en: 'I feel closed up in my chest.', ja: '胸が閉じている感じがします。' }
+      { en: 'I feel closed up in my chest.', ja: '胸が閉じている感じがします。' },
+      { en: 'My chest feels tight.', ja: '胸が詰まった感じがします。' },
+      { en: 'I look hunched in photos.', ja: '写真だと背中が丸く見えます。' }
     ],
     questions: [
       { en: 'Do you notice it more on one side?', ja: '片側のほうが強いと感じますか。' },
@@ -214,7 +231,7 @@ export const symptoms = [
       { en: 'A small muscle under your chest is pulling your shoulder blade forward.', ja: '胸の奥の小さな筋肉が肩甲骨を前に引っ張っています。', note: '小胸筋のこと。' },
       { en: 'Your shoulder blades are sliding away from your spine.', ja: '肩甲骨が背骨から離れていっています。' },
       { en: 'This narrows the space in your shoulder joint.', ja: 'これによって肩関節の空間が狭くなります。' },
-      { en: 'That is why raising your arm feels tight.', ja: 'それが腕を上げると詰まる感じの原因です。' }
+      { en: 'That\'s why raising your arm feels tight.', ja: 'それが腕を上げると詰まる感じの原因です。' }
     ],
     muscles: ['Pectoralis minor', 'Pectoralis major', 'Serratus anterior', 'Rhomboid minor', 'Trapezius (lower)', 'Subscapularis', 'Latissimus dorsi'],
     advice: [
@@ -241,7 +258,10 @@ export const symptoms = [
       { en: 'My lower back arches a lot.', ja: '腰がとても反っています。' },
       { en: 'My stomach sticks out even though I\'m not overweight.', ja: '太っていないのにお腹が出ています。' },
       { en: 'It hurts to stand for a long time.', ja: '長く立っていると痛くなります。' },
-      { en: 'I can fit my whole hand under my back when I lie down.', ja: '仰向けで寝ると腰の下に手がすっぽり入ります。' }
+      { en: 'I can fit my whole hand under my back when I lie down.', ja: '仰向けで寝ると腰の下に手がすっぽり入ります。' },
+      { en: 'My lower back arches too much.', ja: '腰が反りすぎています。' },
+      { en: 'My stomach sticks out even though I\'m not heavy.', ja: '太っていないのにお腹が出て見えます。' },
+      { en: 'My back hurts when I stand for a long time.', ja: '長く立っていると腰が痛くなります。' }
     ],
     questions: [
       { en: 'Is standing worse than sitting for you?', ja: '座るより立っているほうがつらいですか。', note: '反り腰では立位のほうがつらいことが多いです。' },
@@ -253,9 +273,9 @@ export const symptoms = [
     findings: [
       { en: 'Your pelvis is tilted forward, like a bowl spilling water in front.', ja: '骨盤が前に傾いています。ボウルの水が前にこぼれる形です。', note: '骨盤の傾きを説明する定番の比喩。' },
       { en: 'The muscles in the front of your hip are short and tight.', ja: '股関節前面の筋肉が短く硬くなっています。' },
-      { en: 'Your abdominal muscles and glutes are not holding the pelvis back.', ja: '腹筋とお尻の筋肉が骨盤を後ろに保てていません。' },
+      { en: 'Your abdominal muscles and glutes aren\'t holding the pelvis back.', ja: '腹筋とお尻の筋肉が骨盤を後ろに保てていません。' },
       { en: 'The extra curve compresses the joints in your lower back.', ja: '反りが強いと腰の関節が圧迫されます。' },
-      { en: 'That is why standing still is harder than walking.', ja: 'それが、歩くより立ち止まっているほうがつらい理由です。' }
+      { en: 'That\'s why standing still is harder than walking.', ja: 'それが、歩くより立ち止まっているほうがつらい理由です。' }
     ],
     muscles: ['Psoas major', 'Iliacus', 'Rectus femoris', 'Erector spinae', 'Quadratus lumborum', 'Rectus abdominis', 'Gluteus maximus', 'Hamstrings'],
     advice: [
@@ -282,7 +302,8 @@ export const symptoms = [
       { en: 'I have pain between my shoulder blades.', ja: '肩甲骨の間が痛いです。' },
       { en: 'My upper back aches all day.', ja: '背中の上のほうが一日中痛みます。' },
       { en: 'It hurts when I take a deep breath.', ja: '深呼吸すると痛みます。' },
-      { en: 'There\'s a burning feeling in my back.', ja: '背中に焼けるような感じがあります。' }
+      { en: 'There\'s a burning feeling in my back.', ja: '背中に焼けるような感じがあります。' },
+      { en: 'It feels like a knot in my upper back.', ja: '背中の上の方にしこりがある感じです。' }
     ],
     questions: [
       { en: 'Is the pain in the middle or off to one side?', ja: '痛みは真ん中ですか、片側に寄っていますか。' },
@@ -308,7 +329,7 @@ export const symptoms = [
     redFlags: [
       { en: 'Back pain with shortness of breath or chest pain', ja: '息切れや胸痛を伴う背部痛' },
       { en: 'A rash or blisters in a band across the back', ja: '帯状に出る発疹や水疱' },
-      { en: 'Pain that is worse at night and does not change with position', ja: '夜間に強く、体位で変わらない痛み' }
+      { en: 'Pain that\'s worse at night and does not change with position', ja: '夜間に強く、体位で変わらない痛み' }
     ]
   },
 
@@ -324,7 +345,10 @@ export const symptoms = [
       { en: 'It feels like a tight band around my head.', ja: '頭を締めつけられる感じです。', note: '緊張型頭痛の典型的な表現。' },
       { en: 'The pain starts in my neck and goes up.', ja: '首から始まって上に上がってきます。' },
       { en: 'I get migraines.', ja: '片頭痛持ちです。' },
-      { en: 'Light and sound make it worse.', ja: '光と音でひどくなります。', note: '片頭痛の特徴。' }
+      { en: 'Light and sound make it worse.', ja: '光と音でひどくなります。', note: '片頭痛の特徴。' },
+      { en: 'I get headaches a lot.', ja: '頭痛がよく起きます。' },
+      { en: 'My head feels heavy.', ja: '頭が重いです。' },
+      { en: 'I get headaches when I\'m at my computer too long.', ja: 'パソコンを長く使うと頭痛がします。' }
     ],
     questions: [
       { en: 'Where exactly does the headache start?', ja: '頭痛はどこから始まりますか。' },
@@ -342,7 +366,7 @@ export const symptoms = [
       { en: 'When the muscles tighten, they can irritate those nerves.', ja: '筋肉が硬くなると、その神経を刺激することがあります。' },
       { en: 'This type is called a tension headache.', ja: 'このタイプは緊張型頭痛と呼ばれます。' },
       { en: 'Tension headaches often respond well to manual therapy.', ja: '緊張型頭痛は手技療法で改善しやすいです。' },
-      { en: 'Migraines are different. I will work gently and avoid triggering one.', ja: '片頭痛は別のものです。誘発しないようやさしく行います。' }
+      { en: 'Migraines are different. I\'ll work gently and avoid triggering one.', ja: '片頭痛は別のものです。誘発しないようやさしく行います。' }
     ],
     muscles: ['Suboccipital muscles', 'Trapezius (upper)', 'Sternocleidomastoid', 'Splenius capitis', 'Temporalis', 'Masseter', 'Levator scapulae'],
     advice: [
@@ -372,7 +396,11 @@ export const symptoms = [
       { en: 'I feel dizzy a lot.', ja: 'よくめまいがします。' },
       { en: 'The room spins when I turn over in bed.', ja: 'ベッドで寝返りを打つと部屋が回ります。', note: '良性発作性頭位めまい症の典型。医療機関へ。' },
       { en: 'I feel lightheaded when I stand up.', ja: '立ち上がるとふらっとします。' },
-      { en: 'I feel unsteady on my feet.', ja: '足元がふらつきます。' }
+      { en: 'I feel unsteady on my feet.', ja: '足元がふらつきます。' },
+      { en: 'I feel lightheaded.', ja: 'ふらっとします。' },
+      { en: 'The room is spinning.', ja: 'ぐるぐる回る感じがします。' },
+      { en: 'I feel a bit off balance.', ja: '少しふらつきます。' },
+      { en: 'It happens when I stand up quickly.', ja: '急に立ち上がるとなります。' }
     ],
     questions: [
       { en: 'Does the room spin, or do you just feel unsteady?', ja: '部屋が回りますか、ふらつく感じだけですか。', note: '最も重要な鑑別の質問。' },
@@ -387,16 +415,16 @@ export const symptoms = [
       { en: 'Neck tension can sometimes contribute to a feeling of unsteadiness.', ja: '首の緊張がふらつき感に関係することがあります。', note: '"can sometimes" と控えめに。断定は避けます。' },
       { en: 'Your neck muscles send balance information to your brain.', ja: '首の筋肉は脳にバランスの情報を送っています。' },
       { en: 'When they are very tight, that information can get noisy.', ja: '筋肉がとても硬いと、その情報が乱れることがあります。' },
-      { en: 'But dizziness has many causes, and I cannot diagnose it.', ja: 'ただ、めまいの原因は多く、私は診断できません。' },
+      { en: 'But dizziness has many causes, and I can\'t diagnose it.', ja: 'ただ、めまいの原因は多く、私は診断できません。' },
       { en: 'I recommend seeing a doctor to rule out other causes.', ja: '他の原因を除外するため、受診をおすすめします。' },
-      { en: 'Today I will work gently on your neck and shoulders only.', ja: '本日は首と肩をやさしくほぐすだけにします。' }
+      { en: 'Today I\'ll work gently on your neck and shoulders only.', ja: '本日は首と肩をやさしくほぐすだけにします。' }
     ],
     muscles: ['Suboccipital muscles', 'Sternocleidomastoid', 'Scalene muscles', 'Trapezius (upper)', 'Splenius capitis'],
     advice: [
       { en: 'Stand up slowly, especially in the morning.', ja: '特に朝は、ゆっくり立ち上がってください。' },
       { en: 'Sit on the edge of the bed for a few seconds before standing.', ja: '立つ前にベッドの端で数秒座ってください。' },
       { en: 'Stay hydrated throughout the day.', ja: '一日を通して水分を取ってください。' },
-      { en: 'Please do not drive if you feel dizzy.', ja: 'めまいがあるときは運転しないでください。' }
+      { en: 'Please don\'t drive if you feel dizzy.', ja: 'めまいがあるときは運転しないでください。' }
     ],
     redFlags: [
       { en: 'Dizziness with double vision or trouble speaking', ja: '複視やろれつが回らないことを伴うめまい' },
@@ -419,7 +447,10 @@ export const symptoms = [
       { en: 'I feel a pinch in the front of my hip when I sit.', ja: '座ると股関節の前が詰まる感じがします。' },
       { en: 'It hurts on the outside of my hip when I lie on that side.', ja: 'その側を下にして寝ると股関節の外側が痛みます。' },
       { en: 'My hip clicks when I walk.', ja: '歩くと股関節が鳴ります。' },
-      { en: 'It hurts deep in my buttock.', ja: 'お尻の奥が痛みます。' }
+      { en: 'It hurts deep in my buttock.', ja: 'お尻の奥が痛みます。' },
+      { en: 'My hip feels stiff.', ja: '股関節が硬い感じがします。' },
+      { en: 'It hurts to cross my legs.', ja: '脚を組むと痛いです。' },
+      { en: 'It hurts to sleep on that side.', ja: 'その側を下にして寝ると痛いです。' }
     ],
     questions: [
       { en: 'Could you point to exactly where it hurts?', ja: '痛むところを正確に指さしてもらえますか。', note: '股関節では特に重要です。' },
@@ -433,7 +464,7 @@ export const symptoms = [
     findings: [
       { en: 'The muscles on the side of your hip are weak.', ja: '股関節の横の筋肉が弱くなっています。' },
       { en: 'A deep muscle in your buttock is tight and pressing on the nerve.', ja: 'お尻の奥の筋肉が硬く、神経を圧迫しています。', note: '梨状筋。' },
-      { en: 'Your hip is not moving through its full range.', ja: '股関節が本来の可動域まで動いていません。' },
+      { en: 'Your hip isn\'t moving through its full range.', ja: '股関節が本来の可動域まで動いていません。' },
       { en: 'Sitting for long hours shortens the muscles in front of your hip.', ja: '長時間座ると股関節前面の筋肉が縮みます。' },
       { en: 'When one hip is stiff, the lower back has to compensate.', ja: '片方の股関節が硬いと、腰が代償します。' }
     ],
@@ -465,7 +496,11 @@ export const symptoms = [
       { en: 'My knee gives way sometimes.', ja: '膝が時々カクッと崩れます。', note: '不安定性のサイン。要注意。' },
       { en: 'It\'s swollen.', ja: '腫れています。' },
       { en: 'It hurts right under my kneecap.', ja: '膝のお皿の下が痛みます。' },
-      { en: 'My knee is stiff in the morning.', ja: '朝、膝がこわばります。' }
+      { en: 'My knee is stiff in the morning.', ja: '朝、膝がこわばります。' },
+      { en: 'My knee hurts going down stairs.', ja: '階段を下りるときに膝が痛みます。' },
+      { en: 'My knee feels weak.', ja: '膝に力が入らない感じです。' },
+      { en: 'It hurts to kneel.', ja: '膝をつくと痛いです。' },
+      { en: 'My knee makes a cracking sound.', ja: '膝がポキポキ鳴ります。' }
     ],
     questions: [
       { en: 'Is it the inside, outside, front, or back of the knee?', ja: '膝の内側、外側、前、後ろのどこですか。' },
@@ -478,7 +513,7 @@ export const symptoms = [
     ],
     findings: [
       { en: 'The muscles on the front of your thigh are tight.', ja: '太ももの前の筋肉が硬くなっています。' },
-      { en: 'Your kneecap is not tracking in a straight line.', ja: '膝のお皿がまっすぐ動いていません。' },
+      { en: 'Your kneecap isn\'t tracking in a straight line.', ja: '膝のお皿がまっすぐ動いていません。' },
       { en: 'Your hip muscles are weak, so your knee falls inward when you walk.', ja: '股関節の筋肉が弱く、歩くとき膝が内に入っています。' },
       { en: 'The knee is often the victim, not the cause.', ja: '膝は原因ではなく、被害者であることが多いです。', note: '股関節・足首へのアプローチを説明するときに。' },
       { en: 'We should look at your hip and ankle as well.', ja: '股関節と足首も一緒に見ていく必要があります。' },
@@ -488,7 +523,7 @@ export const symptoms = [
     advice: [
       { en: 'Strengthen your thigh by straightening your leg while sitting, fifteen times.', ja: '座って脚を伸ばす運動を15回行い、太ももを鍛えてください。' },
       { en: 'Avoid deep squats and kneeling for now.', ja: '当面、深いスクワットと正座は避けてください。' },
-      { en: 'Ice for fifteen minutes if it is swollen.', ja: '腫れているときは15分冷やしてください。' },
+      { en: 'Ice for fifteen minutes if it\'s swollen.', ja: '腫れているときは15分冷やしてください。' },
       { en: 'Swimming and cycling are easier on your knees than running.', ja: '水泳と自転車はランニングより膝にやさしいです。' },
       { en: 'Check your shoes. Worn-out soles change how your knee moves.', ja: '靴を確認してください。すり減った靴底は膝の動きを変えます。' }
     ],
@@ -513,7 +548,11 @@ export const symptoms = [
       { en: 'I rolled my ankle going down the stairs.', ja: '階段で足首をひねりました。' },
       { en: 'It\'s swollen and bruised.', ja: '腫れて内出血しています。' },
       { en: 'I can walk, but it hurts.', ja: '歩けますが痛みます。' },
-      { en: 'I sprain the same ankle over and over.', ja: '同じ足首を何度も捻挫します。' }
+      { en: 'I sprain the same ankle over and over.', ja: '同じ足首を何度も捻挫します。' },
+      { en: 'I rolled my ankle.', ja: '足首をひねりました。' },
+      { en: 'I twisted my ankle playing soccer.', ja: 'サッカーで足首をひねりました。' },
+      { en: 'It\'s swollen and it hurts to walk.', ja: '腫れていて、歩くと痛いです。' },
+      { en: 'I can put weight on it, but it hurts.', ja: '体重はかけられますが、痛みます。' }
     ],
     questions: [
       { en: 'When exactly did this happen?', ja: '正確にいつ起きましたか。', note: '急性期かどうかの判断に必須。' },
@@ -526,10 +565,10 @@ export const symptoms = [
     ],
     findings: [
       { en: 'This is still in the acute stage, so we need to be careful.', ja: 'まだ急性期ですので、慎重に対応する必要があります。' },
-      { en: 'I would like you to get an X-ray first to rule out a fracture.', ja: '骨折を除外するため、まずレントゲンを撮っていただきたいです。' },
+      { en: 'I\'d like you to get an X-ray first to rule out a fracture.', ja: '骨折を除外するため、まずレントゲンを撮っていただきたいです。' },
       { en: 'Once the swelling goes down, we can start gentle work.', ja: '腫れが引いたら、やさしい施術を始められます。' },
       { en: 'After a sprain, the ankle loses its sense of position.', ja: '捻挫の後、足首は位置を感じる能力が落ちます。' },
-      { en: 'That is why people sprain the same ankle again and again.', ja: 'それが同じ足首を繰り返し捻挫する理由です。' },
+      { en: 'That\'s why people sprain the same ankle again and again.', ja: 'それが同じ足首を繰り返し捻挫する理由です。' },
       { en: 'Balance training is the best way to prevent the next one.', ja: 'バランス訓練が次を防ぐ最善の方法です。' },
       { en: 'The muscles around your ankle are guarding to protect the joint.', ja: '足首まわりの筋肉が関節を守ろうと緊張しています。' }
     ],
@@ -538,7 +577,7 @@ export const symptoms = [
       { en: 'For the first two days: rest, ice, compression, and elevation.', ja: '最初の2日間は安静・冷却・圧迫・挙上を行ってください。', note: 'RICE処置。英語圏では広く知られています。' },
       { en: 'Ice for fifteen minutes, three times a day.', ja: '1日3回、15分ずつ冷やしてください。' },
       { en: 'Keep your ankle above your heart when you rest.', ja: '休むときは足首を心臓より高くしてください。' },
-      { en: 'Do not apply heat in the first few days.', ja: '最初の数日は温めないでください。' },
+      { en: 'Don\'t apply heat in the first few days.', ja: '最初の数日は温めないでください。' },
       { en: 'Once it settles, practice standing on one leg for thirty seconds.', ja: '落ち着いたら、片足立ち30秒を練習してください。' },
       { en: 'Write the alphabet in the air with your toes.', ja: 'つま先で空中に文字を書く運動をしてください。' }
     ],

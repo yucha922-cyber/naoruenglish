@@ -3,6 +3,7 @@
 
 import { phases, allPhrases } from './phrases.js';
 import { phoneTopics, allPhonePhrases } from './phone.js';
+import { meetingTopics, allMeetingPhrases } from './meeting.js';
 import { symptoms, allSymptomPhrases } from './symptoms.js';
 import { muscles, musclesForSymptom } from './muscles.js';
 import { allWords } from './vocabulary.js';
@@ -18,6 +19,10 @@ export function scopeOptions() {
     {
       group: '施術の流れ',
       items: phases.map((p) => ({ id: `flow-${p.id}`, label: `${p.step}. ${p.title}` }))
+    },
+    {
+      group: 'オンライン英会話',
+      items: meetingTopics.map((t) => ({ id: `meeting-${t.id}`, label: t.title }))
     },
     {
       group: '症状別',
@@ -40,7 +45,7 @@ export function isValidScope(id) {
 export function scopeContent(id) {
   if (!id || id === 'all') {
     return {
-      phrases: [...allPhonePhrases(), ...allPhrases(), ...allSymptomPhrases()],
+      phrases: [...allPhonePhrases(), ...allPhrases(), ...allSymptomPhrases(), ...allMeetingPhrases()],
       muscles,
       words: allWords()
     };
@@ -49,6 +54,11 @@ export function scopeContent(id) {
   if (id.startsWith('phone-')) {
     const topicId = id.slice('phone-'.length);
     return { phrases: allPhonePhrases().filter((p) => p.topicId === topicId), muscles: [], words: [] };
+  }
+
+  if (id.startsWith('meeting-')) {
+    const topicId = id.slice('meeting-'.length);
+    return { phrases: allMeetingPhrases().filter((p) => p.topicId === topicId), muscles: [], words: [] };
   }
 
   if (id.startsWith('flow-')) {
@@ -71,7 +81,7 @@ export function scopeContent(id) {
 
 /** こちらから話す側のフレーズだけを返す（発音練習用） */
 export function speakingPhrases(id) {
-  return scopeContent(id).phrases.filter((p) => p.kind === 'therapist' || p.kind === 'staff');
+  return scopeContent(id).phrases.filter((p) => p.kind === 'therapist' || p.kind === 'staff' || p.kind === 'self');
 }
 
 /** そのスコープに対応するサイト内のページ */
@@ -79,6 +89,7 @@ export function scopeHref(id) {
   if (!id || id === 'all') return null;
   if (id.startsWith('phone-')) return `#/phone/${id.slice('phone-'.length)}`;
   if (id.startsWith('flow-')) return `#/flow/${id.slice('flow-'.length)}`;
+  if (id.startsWith('meeting-')) return `#/meeting/${id.slice('meeting-'.length)}`;
   if (id.startsWith('symptom-')) return `#/symptoms/${id.slice('symptom-'.length)}`;
   return null;
 }

@@ -1,0 +1,58 @@
+rules_version = '2';
+
+// Firestore のセキュリティルール
+// Firebase コンソール › Firestore Database › ルール に、このファイルの中身を貼り付けて「公開」してください。
+//
+// ・各ユーザーは自分の記録とお気に入りだけを読み書きできます
+// ・利用者一覧とログイン履歴を読めるのは、ADMIN_EMAILS に書いた管理者だけです
+//   （画面を隠すだけでなく、データそのものをここで守っています）
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ★ 管理者の Gmail アドレス（js/config.js の ADMIN_EMAILS と同じものを書いてください）
+    function adminEmails() {
+      return ['your.name@gmail.com'];
+    }
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in adminEmails();
+    }
+
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // 利用者ごとの記録（メールアドレス・最終アクセス・閲覧中のページ）
+    match /users/{uid} {
+      allow read: if isSelf(uid) || isAdmin();
+      allow create, update: if isSelf(uid)
+        && request.resource.data.email == request.auth.token.email;
+      allow delete: if isAdmin();
+    }
+
+    // お気に入り（本人だけ）
+    match /favorites/{uid} {
+      allow read, write: if isSelf(uid);
+    }
+
+    // ログイン履歴（書き込みは本人の分だけ、読むのは管理者だけ）
+    match /visits/{visitId} {
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email == request.auth.token.email;
+      allow read, delete: if isAdmin();
+      allow update: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

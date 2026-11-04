@@ -1,6 +1,7 @@
 import { allPhrases } from '../data/phrases.js';
 import { allSymptomPhrases } from '../data/symptoms.js';
 import { allPhonePhrases } from '../data/phone.js';
+import { allMeetingPhrases, meetingScript } from '../data/meeting.js';
 import { allWords } from '../data/vocabulary.js';
 import { muscles, muscleTalk } from '../data/muscles.js';
 import { favorites } from '../lib/storage.js';
@@ -11,13 +12,19 @@ function corpus() {
   const items = [];
 
   for (const p of allPhrases()) {
-    items.push({ en: p.en, ja: p.ja, note: p.note, meta: `施術の流れ ／ ${p.source} ／ ${p.group}`, patient: p.kind === 'patient' });
+    items.push({ en: p.en, ja: p.ja, note: p.note, alts: p.alts, meta: `施術の流れ ／ ${p.source} ／ ${p.group}`, patient: p.kind === 'patient' });
   }
   for (const p of allSymptomPhrases()) {
     items.push({ en: p.en, ja: p.ja, note: p.note, meta: `症状別 ／ ${p.source} ／ ${p.group}`, patient: p.kind === 'patient' });
   }
   for (const p of allPhonePhrases()) {
     items.push({ en: p.en, ja: p.ja, note: p.note, meta: `お電話対応 ／ ${p.source} ／ ${p.group}`, patient: p.kind === 'caller' });
+  }
+  for (const p of allMeetingPhrases()) {
+    items.push({ en: p.en, ja: p.ja, note: p.note, alts: p.alts, meta: `オンライン英会話 ／ ${p.source} ／ ${p.group}`, patient: p.kind === 'partner' });
+  }
+  for (const l of meetingScript) {
+    items.push({ en: l.en, ja: l.ja, meta: `オンライン英会話 ／ 通しの台本 ／ ${l.step}`, patient: l.who === 'B' });
   }
   for (const w of allWords()) {
     items.push({ en: w.en, ja: w.ja, note: w.note, meta: `単語集 ／ ${w.source}` });
@@ -50,7 +57,8 @@ export function search(q) {
     (it) =>
       it.en.toLowerCase().includes(needle) ||
       (it.ja || '').toLowerCase().includes(needle) ||
-      (it.note || '').toLowerCase().includes(needle)
+      (it.note || '').toLowerCase().includes(needle) ||
+      (it.alts || []).some((a) => a.toLowerCase().includes(needle))
   );
 }
 
@@ -75,7 +83,9 @@ export function renderResults(q) {
 
 export function renderFavorites() {
   const saved = new Set(favorites.list());
-  const items = getCorpus().filter((it) => saved.has(it.en));
+  // 同じ英文が複数の場所に載っている場合は1件にまとめる
+  const seen = new Set();
+  const items = getCorpus().filter((it) => saved.has(it.en) && !seen.has(it.en) && seen.add(it.en));
 
   if (!items.length) {
     return `

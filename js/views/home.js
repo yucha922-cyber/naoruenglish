@@ -1,6 +1,7 @@
 import { phases } from '../data/phrases.js';
 import { symptoms } from '../data/symptoms.js';
 import { phoneTopics } from '../data/phone.js';
+import { meetingTopics } from '../data/meeting.js';
 import { muscles } from '../data/muscles.js';
 import { allWords } from '../data/vocabulary.js';
 import { favorites, progress } from '../lib/storage.js';
@@ -76,6 +77,14 @@ export function render() {
           <span class="nav-body">
             <strong>筋肉の英語名</strong>
             <span>主要${muscles.length}筋を部位別に</span>
+          </span>
+          <span class="nav-arrow">›</span>
+        </a>
+        <a class="nav-card" href="#/meeting">
+          <span class="nav-icon">💻</span>
+          <span class="nav-body">
+            <strong>オンライン英会話</strong>
+            <span>練習会の入室〜退出まで${meetingTopics.length}場面＋通しの台本</span>
           </span>
           <span class="nav-arrow">›</span>
         </a>
