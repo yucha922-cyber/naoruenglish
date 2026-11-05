@@ -21,6 +21,7 @@ export const ADMIN_EMAILS = [
 
 /**
  * true にすると、ログインしないとサイトを閲覧できなくなります。
- * 「誰が使っているか」を把握するには true のままにしてください。
+ * false なら誰でもログインなしで閲覧でき、ログインは任意です（ログインした人は表示名が出ます）。
+ * オンライン英会話と管理画面は、この設定に関係なく管理者がログインしたときだけ表示されます。
  */
-export const REQUIRE_LOGIN = true;
+export const REQUIRE_LOGIN = false;

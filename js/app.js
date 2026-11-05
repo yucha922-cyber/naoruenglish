@@ -67,19 +67,54 @@ function loginPage() {
 const accountField = document.getElementById('account-field');
 const accountBox = document.getElementById('account-box');
 
+const accountChip = document.getElementById('account-chip');
+
+/** Google の表示名（なければメールアドレスの @ より前） */
+function displayName(u) {
+  return (u?.displayName || u?.email?.split('@')[0] || '').trim();
+}
+
+function renderChip() {
+  if (!authEnabled || !authState.ready) {
+    accountChip.hidden = true;
+    return;
+  }
+  const u = authState.user;
+  accountChip.hidden = false;
+  accountChip.classList.toggle('is-in', Boolean(u));
+  if (u) {
+    const photo = u.photoURL ? `<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">` : '👤';
+    accountChip.innerHTML = `${photo}<span>${esc(displayName(u))} さん</span>`;
+    accountChip.setAttribute('aria-label', 'アカウント');
+  } else {
+    accountChip.innerHTML = '<span>ログイン</span>';
+    accountChip.setAttribute('aria-label', 'Google でログイン（任意）');
+  }
+}
+
+accountChip.addEventListener('click', () => {
+  if (authState.user) document.getElementById('settings-btn').click();
+  else signIn();
+});
+
 function renderAccount() {
+  renderChip();
   if (!authEnabled) return;
   accountField.hidden = false;
   const u = authState.user;
   accountBox.innerHTML = u
-    ? `<p class="account-line">ログイン中：<b>${esc(u.email)}</b></p>
+    ? `<p class="account-line">ログイン中：<b>${esc(displayName(u))}</b>（${esc(u.email)}）</p>
        <p class="field-help" style="margin:0 0 8px">お気に入りはこのアカウントに保存されています。</p>
        <div class="btn-row">
          ${isAdmin() ? '<a class="btn" href="#/admin" data-close>🔒 管理画面</a>' : ''}
          <button class="btn btn-ghost" data-logout>ログアウト</button>
        </div>`
-    : `<p class="field-help" style="margin:0 0 8px">ログインすると、お気に入りを別の端末でも使えます。</p>
-       <button class="btn btn-primary" data-login>Google でログイン</button>`;
+    : `<p class="field-help" style="margin:0 0 8px">
+         ログインは任意です。ログインしなくても、すべてのフレーズを見られます。<br>
+         ログインすると、お名前が表示され、お気に入りを別の端末でも使えます（ログインに使った Gmail アドレスと利用日時が運営者に記録されます）。
+       </p>
+       <button class="btn btn-primary" data-login>Google でログイン</button>
+       ${authState.error ? `<p class="login-error" style="font-size:12.5px;margin:8px 0 0">${esc(authState.error)}</p>` : ''}`;
 }
 
 onAuthChange(() => {
