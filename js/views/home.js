@@ -6,7 +6,7 @@ import { muscles } from '../data/muscles.js';
 import { allWords } from '../data/vocabulary.js';
 import { favorites, progress } from '../lib/storage.js';
 import { esc } from '../lib/ui.js';
-import { isAdmin } from '../lib/auth.js';
+import { isAdmin, authState } from '../lib/auth.js';
 
 export function render() {
   const quiz = progress.quizStats();
@@ -16,6 +16,11 @@ export function render() {
   return `
     <section>
       <div class="page-head">
+        ${
+          authState.user
+            ? `<p class="home-greeting">こんにちは、${esc(authState.user.displayName || authState.user.email.split('@')[0])} さん</p>`
+            : ''
+        }
         <h1>現場で使う英語を、迷わず。</h1>
         <p>来院時の挨拶から施術プランのご提案まで。整体の現場で本当に使う英語だけを集めました。</p>
       </div>
