@@ -74,7 +74,11 @@ function displayName(u) {
   return (u?.displayName || u?.email?.split('@')[0] || '').trim();
 }
 
+const adminBtn = document.getElementById('admin-btn');
+
 function renderChip() {
+  // 管理者だけに、閲覧者の一覧へのボタンを出す
+  adminBtn.hidden = !isAdmin();
   if (!authEnabled || !authState.ready) {
     accountChip.hidden = true;
     return;
@@ -110,7 +114,7 @@ function renderAccount() {
          <button class="btn btn-ghost" data-logout>ログアウト</button>
        </div>`
     : `<p class="field-help" style="margin:0 0 8px">
-         ログインは任意です。ログインしなくても、すべてのフレーズを見られます。<br>
+         ${loginRequired ? 'このサイトはログインしてご利用いただけます。' : 'ログインは任意です。ログインしなくても、すべてのフレーズを見られます。'}<br>
          ログインすると、お名前が表示され、お気に入りを別の端末でも使えます（ログインに使った Gmail アドレスと利用日時が運営者に記録されます）。
        </p>
        <button class="btn btn-primary" data-login>Google でログイン</button>

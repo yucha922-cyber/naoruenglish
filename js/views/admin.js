@@ -4,6 +4,7 @@
 
 import { watchAdminData, ONLINE_WINDOW_MS } from '../lib/auth.js';
 import { esc, pageHead } from '../lib/ui.js';
+import { REQUIRE_LOGIN } from '../config.js';
 
 function fmt(d) {
   if (!d) return '—';
@@ -22,6 +23,11 @@ function ago(d) {
 
 function isOnline(u) {
   return u.online !== false && u.lastSeen && Date.now() - u.lastSeen.getTime() < ONLINE_WINDOW_MS;
+}
+
+/** 名前を大きく、Gmail をその下に。ひと目で誰か分かるように */
+function who(u, online) {
+  return `<span class="admin-who">${online ? '<span class="online-dot"></span>' : ''}<b>${esc(u.name || '（名前なし）')}</b><br><span class="admin-mail">${esc(u.email)}</span></span>`;
 }
 
 export function render() {
@@ -48,12 +54,11 @@ function body({ users, visits }) {
       ${
         online.length
           ? `<div class="admin-table-wrap"><table class="admin-table">
-              <thead><tr><th>Gmail</th><th>名前</th><th>見ているページ</th><th>端末</th><th>最終反応</th></tr></thead>
+              <thead><tr><th>名前 / Gmail</th><th>見ているページ</th><th>端末</th><th>最終反応</th></tr></thead>
               <tbody>${online
                 .map(
                   (u) => `<tr>
-                    <td><span class="online-dot"></span>${esc(u.email)}</td>
-                    <td>${esc(u.name || '')}</td>
+                    <td>${who(u, true)}</td>
                     <td><code>${esc(u.page || '/')}</code></td>
                     <td>${esc(u.device || '')}</td>
                     <td>${esc(ago(u.lastSeen))}</td>
@@ -68,12 +73,11 @@ function body({ users, visits }) {
     <section>
       <h2 class="section-title">ログインしたことのあるユーザー（${users.length}人）</h2>
       <div class="admin-table-wrap"><table class="admin-table">
-        <thead><tr><th>Gmail</th><th>名前</th><th>初回</th><th>最終アクセス</th><th>ログイン回数</th></tr></thead>
+        <thead><tr><th>名前 / Gmail</th><th>初回</th><th>最終アクセス</th><th>ログイン回数</th></tr></thead>
         <tbody>${users
           .map(
             (u) => `<tr>
-              <td>${isOnline(u) ? '<span class="online-dot"></span>' : ''}${esc(u.email)}</td>
-              <td>${esc(u.name || '')}</td>
+              <td>${who(u, isOnline(u))}</td>
               <td>${esc(fmt(u.firstSeen))}</td>
               <td>${esc(fmt(u.lastSeen))}<br><span class="muted">${esc(ago(u.lastSeen))}</span></td>
               <td style="text-align:right">${esc(u.visitCount ?? 0)}</td>
@@ -86,12 +90,12 @@ function body({ users, visits }) {
     <section>
       <h2 class="section-title">最近のログイン履歴（新しい順・最大200件）</h2>
       <div class="admin-table-wrap"><table class="admin-table">
-        <thead><tr><th>日時</th><th>Gmail</th><th>端末</th><th>最初に開いたページ</th></tr></thead>
+        <thead><tr><th>日時</th><th>名前 / Gmail</th><th>端末</th><th>最初に開いたページ</th></tr></thead>
         <tbody>${visits
           .map(
             (v) => `<tr>
               <td>${esc(fmt(v.at))}</td>
-              <td>${esc(v.email)}</td>
+              <td>${who(v, false)}</td>
               <td>${esc(v.device || '')}</td>
               <td><code>${esc(v.page || '/')}</code></td>
             </tr>`
@@ -102,7 +106,7 @@ function body({ users, visits }) {
 
     <p class="disclaimer">
       「いまオンライン」は、直近${Math.round(ONLINE_WINDOW_MS / 60000)}分以内にサイトを開いていた人です。
-      ログインせずに閲覧している人は、この一覧には表示されません（ログインは任意のため）。
+      ${REQUIRE_LOGIN ? 'サイトはログイン必須のため、閲覧者は全員この一覧に表示されます。' : 'ログインせずに閲覧している人は、この一覧には表示されません（ログインは任意のため）。'}
       見覚えのないアカウントが続けて使っている場合は、URLが共有されている可能性があります。
     </p>
   `;
