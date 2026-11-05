@@ -12,7 +12,7 @@ service cloud.firestore {
 
     // ★ 管理者の Gmail アドレス（js/config.js の ADMIN_EMAILS と同じものを書いてください）
     function adminEmails() {
-      return ['your.name@gmail.com'];
+      return ['yucha922@gmail.com'];
     }
 
     function signedIn() {

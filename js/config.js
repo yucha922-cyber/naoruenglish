@@ -5,10 +5,10 @@
 
 /** Firebase コンソール › プロジェクトの設定 › マイアプリ に表示される値をそのまま貼り付けます */
 export const firebaseConfig = {
-  apiKey: '',
-  authDomain: '',
-  projectId: '',
-  appId: ''
+  apiKey: 'AIzaSyAKmV82lF0vc349JPsJgYlGzg8Xjqqc9gA',
+  authDomain: 'naoru-english.firebaseapp.com',
+  projectId: 'naoru-english',
+  appId: '1:155756309742:web:8c3098414c9270d410d7ff'
 };
 
 /**
@@ -16,7 +16,7 @@ export const firebaseConfig = {
  * firestore.rules の ADMIN_EMAILS にも同じアドレスを書いてください（実際のデータ保護はそちらで行います）。
  */
 export const ADMIN_EMAILS = [
-  // 'your.name@gmail.com'
+  'yucha922@gmail.com'
 ];
 
 /**
